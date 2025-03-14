@@ -1,0 +1,19 @@
+.star-rating {
+  line-height:32px;
+  cursor: pointer;
+  font-size: 32px;
+}
+
+.star-rating .a-rating.checked{color: orange;}
+
+.star-rating-view {
+  line-height:32px;
+  
+  
+}
+.star-rating-view .a-rating.checked{color: orange;}
+.a-rating {
+  color: gray;
+}
+
+._star-rating .a-rating.checked{color: orange;}
