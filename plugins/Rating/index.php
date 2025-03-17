@@ -1,7 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
+use App\Controllers\Security_Controller;
 
 defined('PLUGINPATH') or exit('No direct script access allowed');
 
@@ -15,29 +14,42 @@ defined('PLUGINPATH') or exit('No direct script access allowed');
  */
 
 // Add menu item to left menu
-app_hooks()->add_filter('app_filter_staff_left_menu', function ($sidebar_menu) {
-        $sidebar_menu["rating"] = array(
-                "name" => "Rating",
-                "url" => "rating",
-                "class" => "hash",
-                "position" => 3,
-        );
+app_hooks()->add_filter('app_filter_staff_left_menu', 'rating_left_menu');
+app_hooks()->add_filter('app_filter_client_left_menu', 'rating_left_menu');
 
-        return $sidebar_menu;
-});
+if (!function_exists('rating_left_menu')) {
+        function rating_left_menu($sidebar_menu) {
+            $ci = new Security_Controller(); // Khởi tạo bên trong hàm ✅
+    
+            // Nếu là client nhưng không có quyền truy cập, thì không hiển thị menu
+            if ($ci->login_user->user_type === "client" && !get_setting("client_can_access_rating")) {
+                return $sidebar_menu;
+            }
+    
+            // Thêm menu vào sidebar
+            $sidebar_menu["rating"] = array(
+                "name" => "Rating",  // Hiển thị chữ "Rating"
+                "url" => "rating",   // Đường dẫn
+                "class" => "star",   // Icon (thử dùng icon hợp lệ)
+                "position" => 6,
+            );
+    
+            return $sidebar_menu;
+        }
+    }
+    
 
 // Add admin setting menu item
 app_hooks()->add_filter('app_filter_admin_settings_menu', function ($sidebar_menu) {
-        $sidebar_menu["plugins"][] = array("name" => "demo", "url" => "demo_settings");
+        $sidebar_menu["plugins"][] = array("name" => "Rating", "url" => "rating");
         return $sidebar_menu;
 });
 
 
 // Add setting link to the plugin setting
-app_hooks()->add_filter('app_filter_action_links_of_Demo', function () {
+app_hooks()->add_filter('app_filter_action_links_of_Rating', function () {
         $action_links_array = array(
                 anchor(get_uri("rating"), "Rating"),
-                anchor(get_uri("rating_settings"), "Rating settings"),
         );
 
         return $action_links_array;
@@ -45,7 +57,7 @@ app_hooks()->add_filter('app_filter_action_links_of_Demo', function () {
 
 
 register_installation_hook("Rating", function () {
-      
+
         $installFile = __DIR__ . '/install.php';
         if (file_exists($installFile)) {
                 require_once $installFile;

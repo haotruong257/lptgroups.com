@@ -43,12 +43,12 @@
                                     <?php
                                     $file_src = demo_get_source_url(get_demo_setting("file_demo"));
                                     if ($file_src) {
-                                        ?>
+                                    ?>
                                         <img class="demo-file-preview" src="<?php echo demo_get_source_url(get_demo_setting("file_demo")); ?>" alt="..." />
                                     <?php } ?>
                                 </div>
                                 <div class="float-start mr15">
-                                    <?php echo view("includes/dropzone_preview"); ?>    
+                                    <?php echo view("includes/dropzone_preview"); ?>
                                 </div>
                                 <div class="float-start upload-file-button btn btn-default btn-sm">
                                     <span><i data-feather="upload" class="icon-14"></i> <?php echo app_lang("upload"); ?></span>
@@ -71,17 +71,21 @@
 <script type="text/javascript">
     "use strict";
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         $("#demo-settings-form").appForm({
             isModal: false,
-            onSuccess: function (result) {
-                appAlert.success(result.message, {duration: 10000});
+            onSuccess: function(result) {
+                appAlert.success(result.message, {
+                    duration: 10000
+                });
             }
         });
 
         var uploadUrl = "<?php echo get_uri("demo_settings/upload_file"); ?>";
         var validationUrl = "<?php echo get_uri("demo_settings/validate_demo_file"); ?>";
 
-        var dropzone = attachDropzoneWithForm("#demo-settings-form", uploadUrl, validationUrl, {maxFiles: 1});
+        var dropzone = attachDropzoneWithForm("#demo-settings-form", uploadUrl, validationUrl, {
+            maxFiles: 1
+        });
     });
 </script>
