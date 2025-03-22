@@ -1,22 +1,22 @@
 <?php
- namespace App\Models;
+ namespace Rating\Models;
  use App\Models\Crud_model;
-
  class EvaluationCategoryModel extends Crud_model {
     protected $table = 'evaluation_criteria_categories';
     protected $primaryKey = 'id';
-    protected $allowedFields = 'name';
+    protected $allowedFields = ['name'];
  
     public function __construct() {
         parent::__construct();
     }
-
-
-// Get all criteriaCategory
-public function get_all_criteriaCategory() {
-    $db_builder = $this->db->table(get_db_prefix() . 'evaluation_criteria_categories');
+    
+    
+// Get all criteriaCategory 
+public function get_all_criteriaCategory(){
+    $db_builder = $this->db->table(get_db_prefix().'evaluation_criteria_categories');
     $db_builder->orderBy('id', 'asc');
-    return $db_builder->get()->getResultArray();
+    $category = $db_builder->get()->getResultArray();
+    return $category;
 }
 
 // Get criteria details by criteriaCategory ID

@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+namespace Rating\Models;
 
 use App\Models\Crud_model;
 
@@ -64,6 +64,15 @@ class EvaluationModel extends Crud_model {
     public function get_all_criteria() {
         $db_builder = $this->db->table(get_db_prefix() . 'evaluation_criteria');
         $db_builder->orderBy('id', 'asc');
+        $criteria = $db_builder->get()->getResultArray();
+        return $criteria;
+    }
+
+    public function get_all_criteria_with_category() {
+        $db_builder = $this->db->table(get_db_prefix() . 'evaluation_criteria ec');
+        $db_builder->select('ec.id, ec.category_id, ec.noi_dung, ec.diem, cat.name AS category_name');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories cat', 'cat.id = ec.category_id', 'left');
+        $db_builder->orderBy('ec.id', 'asc');
         return $db_builder->get()->getResultArray();
     }
 

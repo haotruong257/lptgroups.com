@@ -3,7 +3,13 @@
 namespace Config;
 
 $routes = Services::routes();
-$routes->get('rating', 'EvaluationController::index', ['namespace' => 'Rating\Controllers']);
+// $routes->get('rating', 'EvaluationController::index', ['namespace' => 'Rating\Controllers']);
+// $routes->get('category', 'EvaluationController::categoryView', ['namespace' => 'Rating\Controllers']);  
+$routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
+    $routes->get('rating', 'EvaluationController::index');
+    $routes->get('category', 'EvaluationController::categoryView');
+});
+
 
 // $routes->get('demo', 'Demo::index', ['namespace' => 'Demo\Controllers']);
 // $routes->get('demo/(:any)', 'Demo::$1', ['namespace' => 'Demo\Controllers']);
