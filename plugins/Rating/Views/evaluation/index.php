@@ -3,7 +3,7 @@
     <button> Quản Lý Danh Mục Tiêu Chí Đánh Giá</button>
 </a>
 
-<h2>Danh sách tiêu chí đánh giá</h2>
+<h2><?php echo app_lang("list_criteria"); ?></h2>
         <table class="table table-bordered">
             <thead>
                 <tr>

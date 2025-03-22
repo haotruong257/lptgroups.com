@@ -1,4 +1,4 @@
-<h2>Danh sách tiêu chí đánh giá</h2>
+<h2><?php echo app_lang("list_criteria_category"); ?></h2>
     <table>
         <thead>
             <tr>
