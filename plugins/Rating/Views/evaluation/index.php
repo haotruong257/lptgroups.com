@@ -7,30 +7,41 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>ID</th>
-            <!-- <th>Category ID</th> -->
-            <th>Danh mục</th>
-            <th>Nội dung</th>
-            <th>Điểm</th>
+            <th rowspan="2">TIÊU CHÍ</th>
+            <th rowspan="2">STT</th>
+            <th rowspan="2">NỘI DUNG ĐÁNH GIÁ</th>
+            <th colspan="5" class="text-center">Điểm</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
         </tr>
     </thead>
     <tbody>
-        <?php if (!empty($criteria)) : ?>
-            <?php foreach ($criteria as $row) : ?>
-                <tr>
-                    <td><?= $row['id'] ?></td>
-                    <td><?= $row['category_name'] ?></td> <!-- Hiển thị tên danh mục -->
-                    <!-- <td><?= $row['category_id'] ?></td> -->
-                    <td><?= $row['noi_dung'] ?></td>
-                    <td><?= $row['diem'] ?></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else : ?>
+        <?php foreach ($criteria as $index => $row): ?>
             <tr>
-                <td colspan="4" class="text-center">Không có dữ liệu.</td>
+                <?php if ($index === 0 || $criteria[$index - 1]['category_id'] !== $row['category_id']): ?>
+                    <td rowspan="<?php echo count(array_filter($criteria, fn($item) => $item['category_id'] === $row['category_id'])); ?>">
+                        <strong><?php echo $row['category_name']; ?></strong>
+                    </td>
+                <?php endif; ?>
+                <td><?php echo $row['id']; ?></td>
+                <td><?php echo nl2br($row['noi_dung']); ?></td>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <td class="text-center">
+                        <input type="radio" name="score[<?php echo $row['id']; ?>]" value="<?php echo $i; ?>">
+                    </td>
+                <?php endfor; ?>
             </tr>
-        <?php endif; ?>
+        <?php endforeach; ?>
     </tbody>
+    <a href="<?= site_url('rating/createCategory') ?>">
+        <button>Thêm Tiêu Chí Đánh Giá</button>
+    </a>
+
 </table>
 
 

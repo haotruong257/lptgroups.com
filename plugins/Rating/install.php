@@ -1,6 +1,7 @@
 <?php
 
 use CodeIgniter\Database\Config;
+
 $db = db_connect('default');
 $dbprefix = get_db_prefix();
 ini_set('display_errors', 1);
@@ -139,7 +140,7 @@ foreach ($tables as $table => $query) {
 }
 
 // Thêm danh mục tiêu chí đánh giá
-$categories = ['Chuyên Cần Và Tác Phong', 'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác','Kỹ năng quản lý'];
+$categories = ['Chuyên Cần Và Tác Phong', 'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác', 'Kỹ năng quản lý'];
 foreach ($categories as $category) {
     $exists = $db->query("SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria_categories` WHERE name = ?", [$category])
         ->getRow()
@@ -175,13 +176,12 @@ $evaluationCriteria = [
             'diem' => null,
             'chiTiet' => []
         ]
-    ]
-    ,
+    ],
     'Kỹ năng quản lý' => [
         [
             'noiDung' => "Kỹ năng lãnh đạo đội nhóm: ",
             'diem' => null,
-            'chiTiet' => [' Điều phối dự án ','Phân chia, sắp xếp công việc']
+            'chiTiet' => [' Điều phối dự án ', 'Phân chia, sắp xếp công việc']
         ]
     ]
 ];
@@ -198,6 +198,5 @@ foreach ($evaluationCriteria as $categoryName => $criteriaList) {
         foreach ($criteria['chiTiet'] as $chiTiet) {
             $db->query("INSERT INTO `{$dbprefix}evaluation_criteria_details` (`criteria_id`, `chi_tiet`) VALUES (?, ?)",  [$criteriaId, $chiTiet]);
         }
-    }                                                                                       
+    }
 }
-

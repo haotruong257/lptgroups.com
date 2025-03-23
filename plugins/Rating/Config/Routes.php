@@ -8,13 +8,6 @@ $routes = Services::routes();
 $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     $routes->get('rating', 'EvaluationController::index');
     $routes->get('category', 'EvaluationController::categoryView');
+    // $routes->get('category/createCategory', 'EvaluationController::createCategory'); // Route để hiển thị form tạo tiêu chí
+    $routes->post('category/createCategory', 'EvaluationController::createCategory'); // Route để xử lý form gửi dữ liệu
 });
-
-
-// $routes->get('demo', 'Demo::index', ['namespace' => 'Demo\Controllers']);
-// $routes->get('demo/(:any)', 'Demo::$1', ['namespace' => 'Demo\Controllers']);
-
-// $routes->get('demo_settings', 'Demo_settings::index', ['namespace' => 'Demo\Controllers']);
-// $routes->get('demo_settings/(:any)', 'Demo_settings::$1', ['namespace' => 'Demo\Controllers']);
-// $routes->post('demo_settings/(:any)', 'Demo_settings::$1', ['namespace' => 'Demo\Controllers']);
-
