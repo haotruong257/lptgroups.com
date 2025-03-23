@@ -71,23 +71,20 @@ function table_exists($table)
 //         FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
 //     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
 // ];
-
 $tables = [
-    //Bảng Danh Mục 
+    // Bảng danh mục tiêu chí đánh giá
     "evaluation_criteria_categories" => "CREATE TABLE `{$dbprefix}evaluation_criteria_categories` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `name` varchar(200) NOT NULL,
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng tiêu chí đánh giá 
+    // Bảng tiêu chí đánh giá (một danh mục có nhiều tiêu chí)
     "evaluation_criteria" => "CREATE TABLE `{$dbprefix}evaluation_criteria` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `category_id` int(11) UNSIGNED NOT NULL,
         `content` varchar(500) NOT NULL,
-        `score_id` int(11) UNSIGNED NOT NULL,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`),
-        FOREIGN KEY (`score_id`) REFERENCES `{$dbprefix}evaluation_scores`(`id`)
+        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
     //bảng chi tiết tiêu chí đánh giá
     "evaluation_criteria_details" => "CREATE TABLE `{$dbprefix}evaluation_criteria_details` (
@@ -97,26 +94,38 @@ $tables = [
         PRIMARY KEY (`id`),
         FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng điểm của từng tiêu chí
+    // Bảng điểm của từng tiêu chí cho từng nhân viên
     "evaluation_scores" => "CREATE TABLE `{$dbprefix}evaluation_scores` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `user_id` int(11) UNSIGNED NOT NULL,
         `criteria_id` int(11) UNSIGNED NOT NULL,
         `score` int(11) NOT NULL,
-        `period` varchar(50) NOT NULL,
         `evaluation_date` DATE NOT NULL,
-        `status` ENUM('Pending', 'Approved', 'Declined') NOT NULL DEFAULT 'Pending',
         PRIMARY KEY (`id`),
         FOREIGN KEY (`user_id`) REFERENCES `{$dbprefix}users`(`id`),
         FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng tổng hợp điểm
+    
+    // Bảng tổng điểm theo từng danh mục
+    "evaluation_category_summary" => "CREATE TABLE `{$dbprefix}evaluation_category_summary` (
+        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `user_id` int(11) UNSIGNED NOT NULL,
+        `category_id` int(11) UNSIGNED NOT NULL,
+        `period` varchar(50) NOT NULL,
+        `total_category_score` int(11) NOT NULL,
+        PRIMARY KEY (`id`),
+        FOREIGN KEY (`user_id`) REFERENCES `{$dbprefix}users`(`id`),
+        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
+    
+    // Bảng tổng hợp điểm cuối cùng để xét hạnh kiểm
     "evaluation_summary" => "CREATE TABLE `{$dbprefix}evaluation_summary` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `user_id` int(11) UNSIGNED NOT NULL,
         `period` varchar(50) NOT NULL,
-        `total_score` int(11) NOT NULL,
+        `rating` ENUM('Kém',' Chưa Đạt','Đạt','Tốt','Xuất sắc') NOT NULL DEFAULT 'Đạt',
         `summary_content` TEXT NOT NULL,
+        `status` ENUM('Pending', 'Approved', 'Declined') NOT NULL DEFAULT 'Pending',
         PRIMARY KEY (`id`),
         FOREIGN KEY (`user_id`) REFERENCES `{$dbprefix}users`(`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
@@ -126,9 +135,10 @@ $tables = [
     //Relation table
     evaluation_criteria_categories 1:n Evaluation_criteria 
     evaluation_criteria_details 1:1  Evaluation_criteria 
-    Evaluation_criteria 1 :n Evaluation_scores :n User
-    Evaluation_scores 1:1 Evaluation_criteria
-    Evaluation_summary 1:n Evaluation_scores
+    Evaluation_criteria 1:n Evaluation_scores :n User
+    Evaluation_summary_category 1:n Evaluation_scores
+    evaluation_criteria_categories 1:n Evaluation_category_summary
+    Evaluation_summary 1:n Evaluation_summary_category
     user 1:n Evaluation_scores
 */
 
