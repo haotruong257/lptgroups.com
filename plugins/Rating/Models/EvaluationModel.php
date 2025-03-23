@@ -78,12 +78,13 @@ class EvaluationModel extends Crud_model
 
     public function get_all_criteria_with_category()
     {
-        $db_builder = $this->db->table(get_db_prefix() . 'evaluation_criteria ec');
-        $db_builder->select('ec.id, ec.category_id, ec.noi_dung, ec.diem, cat.name AS category_name');
-        $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories cat', 'cat.id = ec.category_id', 'left');
-        $db_builder->orderBy('ec.id', 'asc');
+        $db_builder = $this->db->table(get_db_prefix() . 'evaluation_criteria_categories cat');
+        $db_builder->select('cat.id AS category_id, cat.name AS category_name, ec.id, ec.noi_dung, ec.diem');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria ec', 'cat.id = ec.category_id', 'left'); // Giữ LEFT JOIN nhưng đảo vị trí bảng
+        $db_builder->orderBy('cat.id', 'asc')->orderBy('ec.id', 'asc'); // Sắp xếp theo category trước
         return $db_builder->get()->getResultArray();
     }
+
 
     // Get criteria details by criteria ID
     public function get_criteria_details($criteria_id)

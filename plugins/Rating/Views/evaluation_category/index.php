@@ -1,4 +1,8 @@
-<h2><?php echo app_lang("list_criteria_category"); ?></h2>
+<div class="d-flex w-100 align-items-center">
+    <a href="<?= site_url('rating'); ?>" class="btn btn-secondary">Quay lại</a>
+
+    <h2 style="margin: revert"><?php echo app_lang("list_criteria_category"); ?></h2>
+</div>
 <table>
     <thead>
         <tr>
