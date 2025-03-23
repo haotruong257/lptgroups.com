@@ -84,8 +84,10 @@ $tables = [
         `category_id` int(11) UNSIGNED NOT NULL,
         `content` varchar(500) NOT NULL,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`)
+        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`),
+        FOREIGN KEY (`score_id`) REFERENCES `{$dbprefix}evaluation_scores`(`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
+    //bảng chi tiết tiêu chí đánh giá
     //bảng chi tiết tiêu chí đánh giá
     "evaluation_criteria_details" => "CREATE TABLE `{$dbprefix}evaluation_criteria_details` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -150,6 +152,7 @@ foreach ($tables as $table => $query) {
 
 // Thêm danh mục tiêu chí đánh giá
 $categories = ['Chuyên Cần Và Tác Phong', 'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác','Kỹ năng quản lý'];
+$categories = ['Chuyên Cần Và Tác Phong', 'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác','Kỹ năng quản lý'];
 foreach ($categories as $category) {
     $exists = $db->query("SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria_categories` WHERE name = ?", [$category])
         ->getRow()
@@ -203,11 +206,12 @@ foreach ($evaluationCriteria as $categoryName => $criteriaList) {
 
     foreach ($criteriaList as $criteria) {
         $db->query("INSERT INTO `{$dbprefix}evaluation_criteria` (`category_id`, `noi_dung`, `diem`) VALUES (?, ?, ?)", binds: [$categoryId, $criteria['noiDung'], $criteria['diem']]);
+        $db->query("INSERT INTO `{$dbprefix}evaluation_criteria` (`category_id`, `noi_dung`, `diem`) VALUES (?, ?, ?)", binds: [$categoryId, $criteria['noiDung'], $criteria['diem']]);
         $criteriaId = $db->insertID();
 
         foreach ($criteria['chiTiet'] as $chiTiet) {
             $db->query("INSERT INTO `{$dbprefix}evaluation_criteria_details` (`criteria_id`, `chi_tiet`) VALUES (?, ?)",  [$criteriaId, $chiTiet]);
         }
     }                                                                                       
-}
+    }                                                                                       
 
