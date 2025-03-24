@@ -3,8 +3,8 @@
 namespace Rating\Controllers;
 
 use App\Controllers\Security_Controller;
+use Rating\Models\EvaluationCriteriaModel;
 use Rating\Models\EvaluationModel;
-use Rating\Models\EvaluationCategoryModel;
 
 class EvaluationController extends Security_Controller
 {
@@ -13,51 +13,69 @@ class EvaluationController extends Security_Controller
         parent::__construct();
     }
 
+    // Danh sách tiêu chí kèm danh mục
     public function index(): string
     {
-        $model = new  EvaluationModel();
+        $model = new EvaluationModel();
         $data['criteria'] = $model->get_all_criteria_with_category();
+        echo '<pre>';
+        print_r($data['criteria']);
+        echo '</pre>';
+        exit;
+
         return $this->template->rander('Rating\Views\evaluation\index', $data);
     }
+    // public function index2(): string
+    // {
+    //     $model = new EvaluationCriteriaModel();
+    //     $data['criteria'] = $model->get_all_criteria_with_category();
+    //     return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
+    // }
 
+    // Thêm tiêu chí mới
     public function create()
     {
-        $model = new  EvaluationModel();
+        $model = new EvaluationModel();
 
         $data = [
-            'category_id' => $this->request->getPost('category_id'),
+            'category' => $this->request->getPost('category'),
             'noi_dung' => $this->request->getPost('noi_dung'),
             'diem' => $this->request->getPost('diem'),
+            'chi_tiet' => $this->request->getPost('chi_tiet') ?? ''
         ];
-        $model->insert($data);
-        return redirect()->to('/evaluation');
+
+        $model->add_criteria($data);
+        return redirect()->to('/evaluation')->with('success', 'Thêm tiêu chí thành công!');
     }
 
-    public function createCategory()
+    // Chỉnh sửa tiêu chí
+    public function edit($id)
     {
-        $categoryModel = new EvaluationCategoryModel();
-
-        // Nhận dữ liệu từ form
-        // $data = [
-        //     'name' => $this->request->getPost('name'),
-        // ];
-        $data = $this->request->getPost();
-
-        // Thêm danh mục vào database
-        $insert_id = $categoryModel->add_criteriaCategory($data);
-
-        if ($insert_id) {
-            return redirect()->to('/category')->with('success', 'Thêm danh mục thành công!');
-        } else {
-            return redirect()->to('/category')->with('error', 'Thêm danh mục thất bại!');
-        }
+        $model = new EvaluationModel();
+        $data['criteria'] = $model->find($id);
+        return $this->template->rander('Rating\Views\evaluation\edit', $data);
     }
 
-
-    public function categoryView()
+    public function update($id)
     {
-        $model = new  EvaluationCategoryModel();
-        $data['categories'] = $model->get_all_criteriaCategory();
-        return $this->template->rander('Rating\Views\evaluation_category\index', $data);
+        $model = new EvaluationModel();
+
+        $data = [
+            'category' => $this->request->getPost('category'),
+            'noi_dung' => $this->request->getPost('noi_dung'),
+            'diem' => $this->request->getPost('diem'),
+            'chi_tiet' => $this->request->getPost('chi_tiet') ?? ''
+        ];
+
+        $model->update_criteria($data, $id);
+        return redirect()->to('/evaluation')->with('success', 'Cập nhật thành công!');
+    }
+
+    // Xóa tiêu chí
+    public function delete($id)
+    {
+        $model = new EvaluationModel();
+        $model->delete_criteria($id);
+        return redirect()->to('/evaluation')->with('success', 'Xóa tiêu chí thành công!');
     }
 }

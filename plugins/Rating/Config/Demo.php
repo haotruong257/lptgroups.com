@@ -2,8 +2,8 @@
 
 namespace Demo\Config;
 
+use App\Models\EvaluationModel;
 use CodeIgniter\Config\BaseConfig;
-use Demo\Models\Demo_settings_model;
 
 class Demo extends BaseConfig {
 
@@ -12,9 +12,9 @@ class Demo extends BaseConfig {
     );
 
     public function __construct() {
-        $demo_settings_model = new Demo_settings_model();
+        $rating_settings_model = new EvaluationModel();
 
-        $settings = $demo_settings_model->get_all_settings()->getResult();
+        $settings = $rating_settings_model->get_all_settings()->getResult();
         foreach ($settings as $setting) {
             $this->app_settings_array[$setting->setting_name] = $setting->setting_value;
         }

@@ -1,0 +1,97 @@
+<?php
+
+namespace Rating\Models;
+
+use App\Models\Crud_model;
+
+class ChiTietPhieuChamCongModel extends Crud_model
+{
+    protected $table = 'chi_tiet_phieu_cham_cong';
+    protected $primaryKey = 'id';
+    protected $allowedFields = ['id_noi_dung_danh_gia', 'diem_so', 'id_phieu_cham_cong'];
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    // Get all chi_tiet_phieu_cham_cong
+    public function get_all_chi_tiet_phieu_cham_cong()
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->orderBy('id', 'asc');
+        $details = $db_builder->get()->getResultArray();
+        return $details;
+    }
+
+    // Get chi_tiet_phieu_cham_cong by phieu_cham_cong ID
+    public function get_details_by_phieu_cham_cong($id_phieu_cham_cong)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->where('id_phieu_cham_cong', $id_phieu_cham_cong);
+        return $db_builder->get()->getResultArray();
+    }
+
+    // Get chi_tiet_phieu_cham_cong by ID
+    public function get_chi_tiet_phieu_cham_cong($id)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->where('id', $id);
+        return $db_builder->get()->getResultArray();
+    }
+
+    // Add new chi_tiet_phieu_cham_cong
+    public function add_chi_tiet_phieu_cham_cong($data)
+    {
+        if (
+            !isset($data['id_noi_dung_danh_gia']) || empty($data['id_noi_dung_danh_gia']) ||
+            !isset($data['id_phieu_cham_cong']) || empty($data['id_phieu_cham_cong'])
+        ) {
+            return false; // Nếu thiếu id_noi_dung_danh_gia hoặc id_phieu_cham_cong thì trả về false
+        }
+
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->insert($data);
+
+        return $this->db->insertID() ?: false;
+    }
+
+    // Update chi_tiet_phieu_cham_cong
+    public function update_chi_tiet_phieu_cham_cong($data, $id)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->where('id', $id);
+        $db_builder->update($data);
+
+        if ($this->db->affectedRows() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Delete chi_tiet_phieu_cham_cong
+    public function delete_chi_tiet_phieu_cham_cong($id)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->where('id', $id);
+        $db_builder->delete();
+
+        if ($this->db->affectedRows() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Get chi_tiet_phieu_cham_cong with criteria (join with evaluation_criteria)
+    public function get_details_with_criteria($id_phieu_cham_cong)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->select('chi_tiet_phieu_cham_cong.*, evaluation_criteria.noi_dung, evaluation_criteria.category_id');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia');
+        $db_builder->where('chi_tiet_phieu_cham_cong.id_phieu_cham_cong', $id_phieu_cham_cong);
+        $db_builder->orderBy('evaluation_criteria.thu_tu_sap_xep', 'asc');
+        return $db_builder->get()->getResultArray();
+    }
+}

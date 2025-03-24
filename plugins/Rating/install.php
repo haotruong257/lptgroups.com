@@ -11,12 +11,12 @@ error_reporting(E_ALL);
 /**
  * Thêm setting mới nếu chưa tồn tại
  */
-if (!function_exists(function: 'add_setting')) {
+if (!function_exists('add_setting')) {
     function add_setting($name, $value = '')
     {
         global $db;
         if (!setting_exists($name)) {
-            $db->table(tableName: get_db_prefix() . 'settings')->insert([
+            $db->table(get_db_prefix() . 'settings')->insert([
                 'setting_name'  => $name,
                 'setting_value' => $value
             ]);
@@ -29,118 +29,103 @@ if (!function_exists(function: 'add_setting')) {
 /**
  * Kiểm tra setting có tồn tại không
  */
-if (!function_exists(function: 'setting_exists')) {
+if (!function_exists('setting_exists')) {
     function setting_exists($name)
     {
         global $db;
-        return $db->table(tableName: get_db_prefix() . 'settings')->where('setting_name',  $name)->countAllResults() > 0;
+        return $db->table(get_db_prefix() . 'settings')->where('setting_name', $name)->countAllResults() > 0;
     }
 }
 
 /**
  * Kiểm tra bảng có tồn tại hay không
  */
-
-
 function table_exists($table)
 {
     $db = Config::connect(); // Kết nối database
     return $db->query("SHOW TABLES LIKE '{$table}'")->getNumRows() > 0;
 }
 
-
-// //Tạo bảng nếu chưa tồn tại
-// $tables = [
-//     "evaluation_criteria_categories" => "CREATE TABLE `{$dbprefix}evaluation_criteria_categories` (
-//         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-//         `name` varchar(200) NOT NULL,
-//         PRIMARY KEY (`id`)
-//     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-//     "evaluation_criteria" => "CREATE TABLE `{$dbprefix}evaluation_criteria` (
-//         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-//         `category_id` int(11) UNSIGNED NOT NULL,
-//         `noi_dung` varchar(500) NOT NULL,
-//         `diem` int(11) NULL,
-//         PRIMARY KEY (`id`),
-//         FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`)
-//     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-//     "evaluation_criteria_details" => "CREATE TABLE `{$dbprefix}evaluation_criteria_details` (
-//         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-//         `criteria_id` int(11) UNSIGNED NOT NULL,
-//         `chi_tiet` text NOT NULL,
-//         PRIMARY KEY (`id`),
-//         FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
-//     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
-// ];
-
+// Tạo bảng nếu chưa tồn tại
 $tables = [
-    //Bảng Danh Mục 
-    "evaluation_criteria_categories" => "CREATE TABLE `{$dbprefix}evaluation_criteria_categories` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `name` varchar(200) NOT NULL,
+    // Bảng user
+    "user" => "CREATE TABLE `{$dbprefix}user` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng tiêu chí đánh giá 
+
+    // Bảng tieu_chi (tương ứng với evaluation_criteria_categories)
+    "evaluation_criteria_categories" => "CREATE TABLE `{$dbprefix}evaluation_criteria_categories` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(255) NOT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
+
+    // Bảng noi_dung_danh_gia (tương ứng với evaluation_criteria)
     "evaluation_criteria" => "CREATE TABLE `{$dbprefix}evaluation_criteria` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `category_id` int(11) UNSIGNED NOT NULL,
-        `content` varchar(500) NOT NULL,
-        `score_id` int(11) UNSIGNED NOT NULL,
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `category_id` BIGINT UNSIGNED NOT NULL,
+        `noi_dung` TEXT NOT NULL,
+        `thu_tu_sap_xep` BIGINT NOT NULL,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`),
-        FOREIGN KEY (`score_id`) REFERENCES `{$dbprefix}evaluation_scores`(`id`)
+        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //bảng chi tiết tiêu chí đánh giá
-    "evaluation_criteria_details" => "CREATE TABLE `{$dbprefix}evaluation_criteria_details` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `criteria_id` int(11) UNSIGNED NOT NULL,
-        `chi_tiet` text NOT NULL,
+
+    // Bảng phieu_cham_cong
+    "phieu_cham_cong" => "CREATE TABLE `{$dbprefix}phieu_cham_cong` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `created_id` BIGINT UNSIGNED NOT NULL,
+        `approve_id` BIGINT UNSIGNED,
+        `approve_at` DATETIME,
+        `trang_thai` VARCHAR(50),
+        `tong_diem` BIGINT,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
+        FOREIGN KEY (`created_id`) REFERENCES `{$dbprefix}user`(`id`) ON DELETE RESTRICT,
+        FOREIGN KEY (`approve_id`) REFERENCES `{$dbprefix}user`(`id`) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng điểm của từng tiêu chí
-    "evaluation_scores" => "CREATE TABLE `{$dbprefix}evaluation_scores` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `user_id` int(11) UNSIGNED NOT NULL,
-        `criteria_id` int(11) UNSIGNED NOT NULL,
-        `score` int(11) NOT NULL,
-        `period` varchar(50) NOT NULL,
-        `evaluation_date` DATE NOT NULL,
-        `status` ENUM('Pending', 'Approved', 'Declined') NOT NULL DEFAULT 'Pending',
+
+    // Bảng chi_tiet_phieu_cham_cong (thêm ràng buộc CHECK để diem_so từ 1 đến 5)
+    "chi_tiet_phieu_cham_cong" => "CREATE TABLE `{$dbprefix}chi_tiet_phieu_cham_cong` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `id_noi_dung_danh_gia` BIGINT UNSIGNED NOT NULL,
+        `diem_so` BIGINT NOT NULL CHECK (`diem_so` BETWEEN 1 AND 5),
+        `id_phieu_cham_cong` BIGINT UNSIGNED NOT NULL,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`user_id`) REFERENCES `{$dbprefix}users`(`id`),
-        FOREIGN KEY (`criteria_id`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-    //Bảng tổng hợp điểm
-    "evaluation_summary" => "CREATE TABLE `{$dbprefix}evaluation_summary` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `user_id` int(11) UNSIGNED NOT NULL,
-        `period` varchar(50) NOT NULL,
-        `total_score` int(11) NOT NULL,
-        `summary_content` TEXT NOT NULL,
-        PRIMARY KEY (`id`),
-        FOREIGN KEY (`user_id`) REFERENCES `{$dbprefix}users`(`id`)
+        FOREIGN KEY (`id_noi_dung_danh_gia`) REFERENCES `{$dbprefix}evaluation_criteria`(`id`) ON DELETE CASCADE,
+        FOREIGN KEY (`id_phieu_cham_cong`) REFERENCES `{$dbprefix}phieu_cham_cong`(`id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
 ];
 
-/*
-    //Relation table
-    evaluation_criteria_categories 1:n Evaluation_criteria 
-    evaluation_criteria_details 1:1  Evaluation_criteria 
-    Evaluation_criteria 1 :n Evaluation_scores :n User
-    Evaluation_scores 1:1 Evaluation_criteria
-    Evaluation_summary 1:n Evaluation_scores
-    user 1:n Evaluation_scores
-*/
-
+// Tạo các bảng
 foreach ($tables as $table => $query) {
     if (!table_exists($dbprefix . $table)) {
         $db->query($query);
     }
 }
 
-// Thêm danh mục tiêu chí đánh giá
-$categories = ['Chuyên Cần Và Tác Phong', 'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác', 'Kỹ năng quản lý'];
+// Tạo chỉ mục để tối ưu hóa
+$indexes = [
+    "CREATE INDEX idx_evaluation_criteria_categories_name ON `{$dbprefix}evaluation_criteria_categories`(name);",
+    "CREATE INDEX idx_evaluation_criteria_category_id ON `{$dbprefix}evaluation_criteria`(category_id);",
+    "CREATE INDEX idx_chi_tiet_phieu_cham_cong_id_phieu ON `{$dbprefix}chi_tiet_phieu_cham_cong`(id_phieu_cham_cong);",
+    "CREATE INDEX idx_chi_tiet_phieu_cham_cong_id_noi_dung ON `{$dbprefix}chi_tiet_phieu_cham_cong`(id_noi_dung_danh_gia);"
+];
+
+foreach ($indexes as $indexQuery) {
+    $db->query($indexQuery);
+}
+
+// Thêm dữ liệu mẫu
+// 1. Thêm dữ liệu vào bảng user
+$db->query("INSERT INTO `{$dbprefix}user` (`id`) VALUES (1), (2), (3);");
+
+// 2. Thêm danh mục tiêu chí đánh giá (tương ứng với bảng tieu_chi)
+$categories = [
+    'Chuyên Cần Và Tác Phong',
+    'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác',
+    'Kỹ năng quản lý'
+];
+
 foreach ($categories as $category) {
     $exists = $db->query("SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria_categories` WHERE name = ?", [$category])
         ->getRow()
@@ -152,51 +137,75 @@ foreach ($categories as $category) {
 
 // Lấy ID của danh mục
 $categoryMap = [];
-$query = $db->query(sql: "SELECT id, name FROM `{$dbprefix}evaluation_criteria_categories`;");
+$query = $db->query("SELECT id, name FROM `{$dbprefix}evaluation_criteria_categories`;");
 foreach ($query->getResult() as $row) {
     $categoryMap[$row->name] = $row->id;
 }
 
-// Dữ liệu tiêu chí đánh giá
+// 3. Thêm tiêu chí đánh giá (tương ứng với bảng noi_dung_danh_gia)
 $evaluationCriteria = [
     'Chuyên Cần Và Tác Phong' => [
-        [
-            'noiDung' => "Đi làm đúng giờ",
-            'diem' => null,
-            'chiTiet' => [
-                "Được phép đi trễ tối đa 30p/tháng, không quá 10p/lần: không xin phép",
-                "Được phép trễ tối đa 60p/tháng: Có xin duyệt",
-                "Được phép về sớm tối đa 60p/tháng: Có xin duyệt"
-            ]
-        ]
+        ['noiDung' => 'Tuân thủ nội quy quy định công ty, không vi phạm kỷ luật.', 'thuTuSapXep' => 3],
+        ['noiDung' => 'Tác phong gọn gàng: quần áo, tóc tai,...', 'thuTuSapXep' => 4],
+        ['noiDung' => 'Tập trung làm việc, không trì hoãn: luôn check mail, nắm được các thông báo- thay đổi trong quy trình làm việc, nắm được các thông tin từ công ty, ....', 'thuTuSapXep' => 5],
+        ['noiDung' => 'Giữ vệ sinh nơi làm việc: bàn làm việc gọn gàng, tắt điện quạt khi không sử dụng,...', 'thuTuSapXep' => 6],
+        ['noiDung' => 'Luôn có kế hoạch làm việc phù hợp với các công việc được giao', 'thuTuSapXep' => 7],
+        ['noiDung' => 'Có tinh thần cầu tiến trong công việc, tích cực, tử tế, ...', 'thuTuSapXep' => 8],
+        ['noiDung' => 'Hòa đồng, vui vẻ, xây dựng mối quan hệ tốt với đồng nghiệp', 'thuTuSapXep' => 9],
+        ['noiDung' => 'Luôn có thái độ lắng nghe, tiếp thu, phản hồi, góp ý và cải thiện.', 'thuTuSapXep' => 10],
     ],
     'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác' => [
-        [
-            'noiDung' => "Có chuyên môn tại vị trí đảm nhiệm",
-            'diem' => null,
-            'chiTiet' => []
-        ]
+        ['noiDung' => 'Có chuyên môn tại vị trí đảm nhiệm', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Hoàn thành đúng tiến độ đề ra (deadline công việc, dự án)', 'thuTuSapXep' => 3],
+        ['noiDung' => 'Kỹ năng làm việc nhóm và hợp tác với các nhân sự/phòng ban', 'thuTuSapXep' => 4],
+        ['noiDung' => 'Kỹ năng làm việc độc lập', 'thuTuSapXep' => 5],
+        ['noiDung' => 'Khả năng giao tiếp, báo cáo, trình bày, thuyết trình...', 'thuTuSapXep' => 6],
+        ['noiDung' => 'Khả năng thích ứng, linh hoạt với công việc', 'thuTuSapXep' => 7],
+        ['noiDung' => 'Đóng góp vào dự án chung', 'thuTuSapXep' => 8],
+        ['noiDung' => 'Chất lượng công việc: Không bị Khách hàng/nhân sự khác phản ánh, Ít sai sót trong công việc', 'thuTuSapXep' => 9],
+        ['noiDung' => 'Sáng kiến hỗ trợ cải thiện quy trình làm việc hoặc hỗ trợ công việc tốt hơn', 'thuTuSapXep' => 10],
     ],
     'Kỹ năng quản lý' => [
-        [
-            'noiDung' => "Kỹ năng lãnh đạo đội nhóm: ",
-            'diem' => null,
-            'chiTiet' => [' Điều phối dự án ', 'Phân chia, sắp xếp công việc']
-        ]
+        ['noiDung' => 'Kỹ năng lãnh đạo đội nhóm: Điều phối dự án, Phân chia, sắp xếp công việc', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Kỹ năng giao tiếp và truyền đạt, thuyết trình, đảm phấn', 'thuTuSapXep' => 2],
+        ['noiDung' => 'Tự dự chiến lược và lập kế hoạch công việc', 'thuTuSapXep' => 3],
+        ['noiDung' => 'Khả năng phân tích sự việc và giải quyết vấn đề', 'thuTuSapXep' => 4],
+        ['noiDung' => 'Tình chủ động, trách nhiệm với công việc, đội nhóm và cấp trên.', 'thuTuSapXep' => 5],
+        ['noiDung' => 'Khả năng đào tạo nhân sự', 'thuTuSapXep' => 6],
+        ['noiDung' => 'Tình thích nghi, sáng tạo và mạo hiểm trong dẫn dắt đội nhóm', 'thuTuSapXep' => 7],
+        ['noiDung' => 'Kỹ năng báo cáo', 'thuTuSapXep' => 8],
+        ['noiDung' => 'Khả năng truyền động lực, cảm hứng làm việc cho nhân sự', 'thuTuSapXep' => 9],
+        ['noiDung' => 'Khả năng chịu áp lực', 'thuTuSapXep' => 10],
     ]
 ];
 
-// Thêm tiêu chí đánh giá và chi tiết
+// Thêm tiêu chí đánh giá
 foreach ($evaluationCriteria as $categoryName => $criteriaList) {
     if (!isset($categoryMap[$categoryName])) continue;
     $categoryId = $categoryMap[$categoryName];
 
     foreach ($criteriaList as $criteria) {
-        $db->query("INSERT INTO `{$dbprefix}evaluation_criteria` (`category_id`, `noi_dung`, `diem`) VALUES (?, ?, ?)", binds: [$categoryId, $criteria['noiDung'], $criteria['diem']]);
-        $criteriaId = $db->insertID();
+        // Kiểm tra xem tiêu chí đã tồn tại chưa
+        $exists = $db->query(
+            "SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria` WHERE category_id = ? AND noi_dung = ? AND thu_tu_sap_xep = ?",
+            [$categoryId, $criteria['noiDung'], $criteria['thuTuSapXep']]
+        )->getRow()->count;
 
-        foreach ($criteria['chiTiet'] as $chiTiet) {
-            $db->query("INSERT INTO `{$dbprefix}evaluation_criteria_details` (`criteria_id`, `chi_tiet`) VALUES (?, ?)",  [$criteriaId, $chiTiet]);
+        if ($exists == 0) {
+            // Chỉ chèn nếu tiêu chí chưa tồn tại
+            $db->query(
+                "INSERT INTO `{$dbprefix}evaluation_criteria` (`category_id`, `noi_dung`, `thu_tu_sap_xep`) VALUES (?, ?, ?)",
+                [$categoryId, $criteria['noiDung'], $criteria['thuTuSapXep']]
+            );
         }
     }
 }
+
+// 4. Thêm dữ liệu vào bảng phieu_cham_cong (không gán điểm số, để trống tong_diem)
+$db->query(
+    "INSERT INTO `{$dbprefix}phieu_cham_cong` (`created_id`, `approve_id`, `approve_at`, `trang_thai`, `tong_diem`) VALUES (?, ?, ?, ?, ?)",
+    [2, 3, '2025-03-24 10:00:00', 'Đã phê duyệt', NULL]
+);
+
+// 5. Bỏ qua việc chèn dữ liệu vào bảng chi_tiet_phieu_cham_cong
+// Dữ liệu điểm số sẽ được thêm sau thông qua giao diện hoặc logic khác
