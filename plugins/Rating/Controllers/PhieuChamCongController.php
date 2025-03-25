@@ -48,37 +48,39 @@ class PhieuChamCongController extends Security_Controller
         print_r($phieuData);
         echo "</pre>";
         // Lưu bản ghi vào bảng phieu_cham_cong
-        // $idPhieuChamCong = $model->add_phieu_cham_cong($phieuData);
-        // if (!$idPhieuChamCong) {
-        //     return redirect()->to('/phieu_cham_cong')->with('error', 'Không thể tạo phiếu chấm công.');
-        // }
-
+        $idPhieuChamCong = $model->add_phieu_cham_cong($phieuData);
+        if (!$idPhieuChamCong) {
+            return redirect()->to('/phieu_cham_cong')->with('error', 'Không thể tạo phiếu chấm công.');
+        }
         // // Lấy điểm số từ form
-        // $scores = $this->request->getPost('score');
-        // if (empty($scores)) {
-        //     return redirect()->to('/phieu_cham_cong')->with('error', 'Vui lòng chấm điểm ít nhất một tiêu chí.');
-        // }
+        $scores = $this->request->getPost('score');
+        if (empty($scores)) {
+            return redirect()->to('/phieu_cham_cong')->with('error', 'Vui lòng chấm điểm ít nhất một tiêu chí.');
+        }
 
         // Lưu chi tiết vào bảng chi_tiet_phieu_cham_cong
-        // $chiTietModel = new ChiTietPhieuChamCongModel();
-        // $tongDiem = 0;
-        // foreach ($scores as $idNoiDung => $diemSo) {
-        //     if (!is_numeric($diemSo) || $diemSo < 1 || $diemSo > 5) {
-        //         continue; // Bỏ qua nếu điểm không hợp lệ
-        //     }
+        $chiTietModel = new ChiTietPhieuChamCongModel();
+        $tongDiem = 0;
+        foreach ($scores as $idNoiDung => $diemSo) {
+            if (!is_numeric($diemSo) || $diemSo < 1 || $diemSo > 5) {
+                continue; // Bỏ qua nếu điểm không hợp lệ
+            }
 
-        //     $chiTietData = [
-        //         'id_phieu_cham_cong' => $idPhieuChamCong,
-        //         'id_noi_dung_danh_gia' => $idNoiDung,
-        //         'diem_so' => $diemSo
-        //     ];
+            $chiTietData = [
+                'id_phieu_cham_cong' => $idPhieuChamCong,
+                'id_noi_dung_danh_gia' => $idNoiDung,
+                'diem_so' => $diemSo
+            ];
 
-        //     $chiTietModel->insert($chiTietData);
-        //     $tongDiem += $diemSo;
-        // }
-
+            if (!$chiTietModel->add_chi_tiet_phieu_cham_cong($chiTietData)) {
+                // Xử lý lỗi nếu có
+                return redirect()->to('/phieu_cham_cong')->with('error', 'Có lỗi khi lưu chi tiết phiếu chấm công.');
+            }
+        }
+        $tongDiem = $chiTietModel->calculate_total_score($idPhieuChamCong);
         // Cập nhật tổng điểm vào bảng phieu_cham_cong
-        // $model->update($idPhieuChamCong, ['tong_diem' => $tongDiem]);
+
+        $model->update_phieu_cham_cong(['tong_diem' => $tongDiem], $idPhieuChamCong);
 
         // return redirect()->to('/phieu_cham_cong')->with('success', 'Thêm phiếu chấm công thành công!');
     }

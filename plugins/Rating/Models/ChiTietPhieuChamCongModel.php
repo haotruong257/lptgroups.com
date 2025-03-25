@@ -45,9 +45,10 @@ class ChiTietPhieuChamCongModel extends Crud_model
     {
         if (
             !isset($data['id_noi_dung_danh_gia']) || empty($data['id_noi_dung_danh_gia']) ||
-            !isset($data['id_phieu_cham_cong']) || empty($data['id_phieu_cham_cong'])
+            !isset($data['id_phieu_cham_cong']) || empty($data['id_phieu_cham_cong']) ||
+            !isset($data['diem_so']) || !is_numeric($data['diem_so']) || $data['diem_so'] < 1 || $data['diem_so'] > 5
         ) {
-            return false; // Nếu thiếu id_noi_dung_danh_gia hoặc id_phieu_cham_cong thì trả về false
+            return false; // Trả về false nếu dữ liệu không hợp lệ
         }
 
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
@@ -55,10 +56,22 @@ class ChiTietPhieuChamCongModel extends Crud_model
 
         return $this->db->insertID() ?: false;
     }
+    public function calculate_total_score($id_phieu_cham_cong)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->selectSum('diem_so', 'total_score');
+        $db_builder->where('id_phieu_cham_cong', $id_phieu_cham_cong);
+        $result = $db_builder->get()->getRowArray();
 
+        return $result['total_score'] ?? 0;
+    }
     // Update chi_tiet_phieu_cham_cong
     public function update_chi_tiet_phieu_cham_cong($data, $id)
     {
+        if (isset($data['diem_so']) && (!is_numeric($data['diem_so']) || $data['diem_so'] < 1 || $data['diem_so'] > 5)) {
+            return false; // Trả về false nếu diem_so không hợp lệ
+        }
+
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
         $db_builder->where('id', $id);
         $db_builder->update($data);
@@ -69,7 +82,6 @@ class ChiTietPhieuChamCongModel extends Crud_model
 
         return false;
     }
-
     // Delete chi_tiet_phieu_cham_cong
     public function delete_chi_tiet_phieu_cham_cong($id)
     {
@@ -88,8 +100,9 @@ class ChiTietPhieuChamCongModel extends Crud_model
     public function get_details_with_criteria($id_phieu_cham_cong)
     {
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
-        $db_builder->select('chi_tiet_phieu_cham_cong.*, evaluation_criteria.noi_dung, evaluation_criteria.category_id');
+        $db_builder->select('chi_tiet_phieu_cham_cong.*, evaluation_criteria.noi_dung, evaluation_criteria.thu_tu_sap_xep, evaluation_criteria.id_tieu_chi, evaluation_criteria_categories.name as category_name');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories', 'evaluation_criteria_categories.id = evaluation_criteria.id_tieu_chi', 'left');
         $db_builder->where('chi_tiet_phieu_cham_cong.id_phieu_cham_cong', $id_phieu_cham_cong);
         $db_builder->orderBy('evaluation_criteria.thu_tu_sap_xep', 'asc');
         return $db_builder->get()->getResultArray();
