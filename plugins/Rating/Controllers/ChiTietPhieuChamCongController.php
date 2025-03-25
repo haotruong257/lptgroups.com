@@ -13,16 +13,18 @@ class ChiTietPhieuChamCongController extends Security_Controller
     }
 
     // Danh sách chi tiết phiếu chấm công
-    public function index($id_phieu_cham_cong = null): string
-    {
-        $model = new ChiTietPhieuChamCongModel();
-        if ($id_phieu_cham_cong) {
-            $data['details'] = $model->get_details_with_criteria($id_phieu_cham_cong);
-        } else {
-            $data['details'] = $model->get_all_chi_tiet_phieu_cham_cong();
-        }
-        return $this->template->rander('Rating\Views\chi_tiet_phieu_cham_cong\index', $data);
+   public function index($id_phieu_cham_cong = null): string
+{
+    $model = new ChiTietPhieuChamCongModel();
+    if ($id_phieu_cham_cong) {
+        $data['details'] = $model->get_details_with_criteria($id_phieu_cham_cong);
+        $data['id_phieu_cham_cong'] = $id_phieu_cham_cong;
+        $data['tong_diem'] = $model->calculate_total_score($id_phieu_cham_cong);
+    } else {
+        $data['details'] = $model->get_all_chi_tiet_phieu_cham_cong(10, $this->request->getGet('page') ? ($this->request->getGet('page') - 1) * 10 : 0);
     }
+    return $this->template->rander('Rating\Views\chi_tiet_phieu_cham_cong\index', $data);
+}
     public function test()
     {
         echo "test";

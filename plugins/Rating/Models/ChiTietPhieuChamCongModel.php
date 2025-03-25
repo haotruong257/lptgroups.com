@@ -16,14 +16,29 @@ class ChiTietPhieuChamCongModel extends Crud_model
     }
 
     // Get all chi_tiet_phieu_cham_cong
-    public function get_all_chi_tiet_phieu_cham_cong()
+
+    // File: Rating/Models/ChiTietPhieuChamCongModel.php
+
+    public function get_all_chi_tiet_phieu_cham_cong($limit = 10, $offset = 0)
     {
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
-        $db_builder->orderBy('id', 'asc');
+        $db_builder->select('chi_tiet_phieu_cham_cong.*, 
+            evaluation_criteria.noi_dung, 
+            evaluation_criteria.id_tieu_chi, 
+            evaluation_criteria.thu_tu_sap_xep, 
+            evaluation_criteria_categories.name as category_name, 
+            phieu_cham_cong.created_id, 
+            phieu_cham_cong.created_at, 
+            users.first_name as employee_name');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia', 'left');
+        $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories', 'evaluation_criteria_categories.id = evaluation_criteria.id_tieu_chi', 'left');
+        $db_builder->join(get_db_prefix() . 'phieu_cham_cong', 'phieu_cham_cong.id = chi_tiet_phieu_cham_cong.id_phieu_cham_cong', 'left');
+        $db_builder->join(get_db_prefix() . 'users', 'users.id = phieu_cham_cong.created_id', 'left');
+        $db_builder->orderBy('chi_tiet_phieu_cham_cong.id', 'asc');
+        $db_builder->limit($limit, $offset);
         $details = $db_builder->get()->getResultArray();
         return $details;
     }
-
     // Get chi_tiet_phieu_cham_cong by phieu_cham_cong ID
     public function get_details_by_phieu_cham_cong($id_phieu_cham_cong)
     {
@@ -31,6 +46,15 @@ class ChiTietPhieuChamCongModel extends Crud_model
         $db_builder->where('id_phieu_cham_cong', $id_phieu_cham_cong);
         return $db_builder->get()->getResultArray();
     }
+
+    public function is_criteria_already_scored($id_phieu_cham_cong, $id_noi_dung_danh_gia)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
+        $db_builder->where('id_phieu_cham_cong', $id_phieu_cham_cong);
+        $db_builder->where('id_noi_dung_danh_gia', $id_noi_dung_danh_gia);
+        return $db_builder->countAllResults() > 0;
+    }
+
 
     // Get chi_tiet_phieu_cham_cong by ID
     public function get_chi_tiet_phieu_cham_cong($id)
@@ -100,9 +124,17 @@ class ChiTietPhieuChamCongModel extends Crud_model
     public function get_details_with_criteria($id_phieu_cham_cong)
     {
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
-        $db_builder->select('chi_tiet_phieu_cham_cong.*, evaluation_criteria.noi_dung, evaluation_criteria.thu_tu_sap_xep, evaluation_criteria.id_tieu_chi, evaluation_criteria_categories.name as category_name');
+        $db_builder->select('chi_tiet_phieu_cham_cong.*, 
+            evaluation_criteria.noi_dung, 
+            evaluation_criteria.thu_tu_sap_xep, 
+            evaluation_criteria.id_tieu_chi, 
+            evaluation_criteria_categories.name as category_name, 
+            phieu_cham_cong.created_at, 
+            users.first_name as employee_name');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories', 'evaluation_criteria_categories.id = evaluation_criteria.id_tieu_chi', 'left');
+        $db_builder->join(get_db_prefix() . 'phieu_cham_cong', 'phieu_cham_cong.id = chi_tiet_phieu_cham_cong.id_phieu_cham_cong', 'left');
+        $db_builder->join(get_db_prefix() . 'users', 'users.id = phieu_cham_cong.created_id', 'left');
         $db_builder->where('chi_tiet_phieu_cham_cong.id_phieu_cham_cong', $id_phieu_cham_cong);
         $db_builder->orderBy('evaluation_criteria.thu_tu_sap_xep', 'asc');
         return $db_builder->get()->getResultArray();

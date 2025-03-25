@@ -25,14 +25,9 @@ class PhieuChamCongController extends Security_Controller
     // Thêm phiếu chấm công mới
     public function create()
     {
-        // Kiểm tra xem người dùng đã đăng nhập chưa
-        // if (!session()->get('isLoggedIn') || !session()->get('user_id')) {
-        //     return redirect()->to('/login')->with('error', 'Vui lòng đăng nhập để thực hiện hành động này.');
-        // }
-
         $model = new PhieuChamCongModel();
 
-        // Lấy user_id của người dùng hiện tại từ session
+        // Lấy user_id của người dùng hiện tại 
         $currentUserId = $this->Users_model->login_user_id();
 
         // Dữ liệu cho bảng phieu_cham_cong
