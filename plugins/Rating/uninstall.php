@@ -25,8 +25,3 @@ if ($db->tableExists($dbprefix . 'evaluation_criteria')) {
 if ($db->tableExists($dbprefix . 'evaluation_criteria_categories')) {
     $db->query('DROP TABLE `' . $dbprefix . 'evaluation_criteria_categories`;');
 }
-
-// Xóa bảng user
-if ($db->tableExists($dbprefix . 'user')) {
-    $db->query('DROP TABLE `' . $dbprefix . 'user`;');
-}

@@ -11,7 +11,8 @@ use App\Libraries\Template;
 use App\Libraries\Google;
 use CodeIgniter\Controller;
 
-class App_Controller extends Controller {
+class App_Controller extends Controller
+{
 
     protected $template;
     public $session;
@@ -88,7 +89,8 @@ class App_Controller extends Controller {
     public $Reminder_settings_model;
     public $Reminder_logs_model;
 
-    public function __construct() {
+    public function __construct()
+    {
         //main template to make frame of this app
         $this->template = new Template();
 
@@ -125,7 +127,8 @@ class App_Controller extends Controller {
         }
     }
 
-    private function _is_current_url_same_as_base_url() {
+    private function _is_current_url_same_as_base_url()
+    {
         // the base_url() will always give the ..site.com/
         // but the current_url() will give ..site.com/index.php if there has config in App.php -> $indexPage = 'index.php' and ..site.com/ if nothing in $indexPage
         // so remove index.php/ from the current url and compare with base url
@@ -133,11 +136,13 @@ class App_Controller extends Controller {
         return $clean_current_url == base_url();
     }
 
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger) {
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+    {
         parent::initController($request, $response, $logger); //don't edit this line
     }
 
-    private function get_models_array() {
+    private function get_models_array()
+    {
         return array(
             'Settings_model',
             'Users_model',
@@ -212,7 +217,8 @@ class App_Controller extends Controller {
     }
 
     //validate submitted data
-    protected function validate_submitted_data($fields = array(), $return_errors = false, $json_response = true) {
+    protected function validate_submitted_data($fields = array(), $return_errors = false, $json_response = true)
+    {
         $final_fields = array();
 
         foreach ($fields as $field => $validate) {
@@ -261,7 +267,8 @@ class App_Controller extends Controller {
      * @param string $serialized_file_data 
      * @return download files
      */
-    protected function download_app_files($directory_path, $serialized_file_data) {
+    protected function download_app_files($directory_path, $serialized_file_data)
+    {
         $file_exists = false;
         if ($serialized_file_data) {
             $files = unserialize($serialized_file_data);
@@ -358,7 +365,8 @@ class App_Controller extends Controller {
     }
 
     //get currency dropdown list
-    protected function _get_currency_dropdown_select2_data() {
+    protected function _get_currency_dropdown_select2_data()
+    {
         $currency = array(array("id" => "", "text" => "-"));
         foreach (get_international_currency_code_dropdown() as $value) {
             $currency[] = array("id" => $value, "text" => $value);

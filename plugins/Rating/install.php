@@ -43,48 +43,43 @@ if (!function_exists('setting_exists')) {
 function table_exists($table)
 {
     $db = Config::connect(); // Kết nối database
-    return $db->query("SHOW TABLES LIKE '{$table}'")->getNumRows() > 0;
+    return $db->tableExists($table); // Sử dụng tableExists() của CodeIgniter
 }
 
 // Tạo bảng nếu chưa tồn tại
 $tables = [
-    // Bảng user
-    "user" => "CREATE TABLE `{$dbprefix}user` (
-        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-
     // Bảng tieu_chi (tương ứng với evaluation_criteria_categories)
     "evaluation_criteria_categories" => "CREATE TABLE `{$dbprefix}evaluation_criteria_categories` (
         `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        `name` VARCHAR(255) NOT NULL,
+        `name` VARCHAR(255) NOT NULL, -- Sửa BIGINT? thành VARCHAR theo logic
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
 
     // Bảng noi_dung_danh_gia (tương ứng với evaluation_criteria)
     "evaluation_criteria" => "CREATE TABLE `{$dbprefix}evaluation_criteria` (
         `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        `category_id` BIGINT UNSIGNED NOT NULL,
-        `noi_dung` TEXT NOT NULL,
+        `id_tieu_chi` BIGINT UNSIGNED NOT NULL, -- Đổi tên category_id thành id_tieu_chi theo diagram
+        `noi_dung` TEXT NOT NULL, -- Sửa BIGINT? thành TEXT
         `thu_tu_sap_xep` BIGINT NOT NULL,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`category_id`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`) ON DELETE CASCADE
+        FOREIGN KEY (`id_tieu_chi`) REFERENCES `{$dbprefix}evaluation_criteria_categories`(`id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
 
-    // Bảng phieu_cham_cong
+    // Bảng phieu_cham_cong (sửa kiểu dữ liệu của created_id và approve_id thành INT để khớp với bảng users)
     "phieu_cham_cong" => "CREATE TABLE `{$dbprefix}phieu_cham_cong` (
         `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        `created_id` BIGINT UNSIGNED NOT NULL,
-        `approve_id` BIGINT UNSIGNED,
+        `created_id` INT NOT NULL,
+        `created_at` DATETIME,
+        `approve_id` INT,
         `approve_at` DATETIME,
-        `trang_thai` VARCHAR(50),
+        `trang_thai` ENUM('pending', 'approve', 'reject') NOT NULL DEFAULT 'pending',
         `tong_diem` BIGINT,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`created_id`) REFERENCES `{$dbprefix}user`(`id`) ON DELETE RESTRICT,
-        FOREIGN KEY (`approve_id`) REFERENCES `{$dbprefix}user`(`id`) ON DELETE SET NULL
+        FOREIGN KEY (`created_id`) REFERENCES `{$dbprefix}users`(`id`) ON DELETE RESTRICT,
+        FOREIGN KEY (`approve_id`) REFERENCES `{$dbprefix}users`(`id`) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
 
-    // Bảng chi_tiet_phieu_cham_cong (thêm ràng buộc CHECK để diem_so từ 1 đến 5)
+    // Bảng chi_tiet_phieu_cham_cong (sửa kiểu dữ liệu của id_phieu_cham_cong thành BIGINT UNSIGNED để khớp với id của phieu_cham_cong)
     "chi_tiet_phieu_cham_cong" => "CREATE TABLE `{$dbprefix}chi_tiet_phieu_cham_cong` (
         `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_noi_dung_danh_gia` BIGINT UNSIGNED NOT NULL,
@@ -106,7 +101,7 @@ foreach ($tables as $table => $query) {
 // Tạo chỉ mục để tối ưu hóa
 $indexes = [
     "CREATE INDEX idx_evaluation_criteria_categories_name ON `{$dbprefix}evaluation_criteria_categories`(name);",
-    "CREATE INDEX idx_evaluation_criteria_category_id ON `{$dbprefix}evaluation_criteria`(category_id);",
+    "CREATE INDEX idx_evaluation_criteria_id_tieu_chi ON `{$dbprefix}evaluation_criteria`(id_tieu_chi);",
     "CREATE INDEX idx_chi_tiet_phieu_cham_cong_id_phieu ON `{$dbprefix}chi_tiet_phieu_cham_cong`(id_phieu_cham_cong);",
     "CREATE INDEX idx_chi_tiet_phieu_cham_cong_id_noi_dung ON `{$dbprefix}chi_tiet_phieu_cham_cong`(id_noi_dung_danh_gia);"
 ];
@@ -114,10 +109,6 @@ $indexes = [
 foreach ($indexes as $indexQuery) {
     $db->query($indexQuery);
 }
-
-// Thêm dữ liệu mẫu
-// 1. Thêm dữ liệu vào bảng user
-$db->query("INSERT INTO `{$dbprefix}user` (`id`) VALUES (1), (2), (3);");
 
 // 2. Thêm danh mục tiêu chí đánh giá (tương ứng với bảng tieu_chi)
 $categories = [
@@ -187,20 +178,19 @@ foreach ($evaluationCriteria as $categoryName => $criteriaList) {
     foreach ($criteriaList as $criteria) {
         // Kiểm tra xem tiêu chí đã tồn tại chưa
         $exists = $db->query(
-            "SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria` WHERE category_id = ? AND noi_dung = ? AND thu_tu_sap_xep = ?",
+            "SELECT COUNT(*) AS count FROM `{$dbprefix}evaluation_criteria` WHERE id_tieu_chi = ? AND noi_dung = ? AND thu_tu_sap_xep = ?",
             [$categoryId, $criteria['noiDung'], $criteria['thuTuSapXep']]
         )->getRow()->count;
 
         if ($exists == 0) {
             // Chỉ chèn nếu tiêu chí chưa tồn tại
             $db->query(
-                "INSERT INTO `{$dbprefix}evaluation_criteria` (`category_id`, `noi_dung`, `thu_tu_sap_xep`) VALUES (?, ?, ?)",
+                "INSERT INTO `{$dbprefix}evaluation_criteria` (`id_tieu_chi`, `noi_dung`, `thu_tu_sap_xep`) VALUES (?, ?, ?)",
                 [$categoryId, $criteria['noiDung'], $criteria['thuTuSapXep']]
             );
         }
     }
 }
-
 // 4. Thêm dữ liệu vào bảng phieu_cham_cong (không gán điểm số, để trống tong_diem)
 $db->query(
     "INSERT INTO `{$dbprefix}phieu_cham_cong` (`created_id`, `approve_id`, `approve_at`, `trang_thai`, `tong_diem`) VALUES (?, ?, ?, ?, ?)",

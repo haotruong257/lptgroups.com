@@ -18,10 +18,6 @@ class EvaluationCriteriaController extends Security_Controller
         $model = new EvaluationCriteriaModel();
         $data['criteria'] = $model->get_all_criteria_with_category();
         return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-        die();
     }
 
     // Thêm tiêu chí mới
@@ -30,7 +26,7 @@ class EvaluationCriteriaController extends Security_Controller
         $model = new EvaluationCriteriaModel();
 
         $data = [
-            'category_id' => $this->request->getPost('category_id'),
+            'id_tieu_chi' => $this->request->getPost('id_tieu_chi'),
             'noi_dung' => $this->request->getPost('noi_dung'),
             'thu_tu_sap_xep' => $this->request->getPost('thu_tu_sap_xep')
         ];
@@ -52,7 +48,7 @@ class EvaluationCriteriaController extends Security_Controller
         $model = new EvaluationCriteriaModel();
 
         $data = [
-            'category_id' => $this->request->getPost('category_id'),
+            'id_tieu_chi' => $this->request->getPost('id_tieu_chi'),
             'noi_dung' => $this->request->getPost('noi_dung'),
             'thu_tu_sap_xep' => $this->request->getPost('thu_tu_sap_xep')
         ];

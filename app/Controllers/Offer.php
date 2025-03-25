@@ -222,7 +222,7 @@ class Offer extends Security_Controller
             show_404();
         }
 
-        if(!$this->check_proposal_pdf_access_for_clients()){
+        if (!$this->check_proposal_pdf_access_for_clients()) {
             show_404();
         }
 

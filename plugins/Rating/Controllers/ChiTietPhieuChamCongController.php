@@ -23,15 +23,24 @@ class ChiTietPhieuChamCongController extends Security_Controller
         }
         return $this->template->rander('Rating\Views\chi_tiet_phieu_cham_cong\index', $data);
     }
-
+    public function test()
+    {
+        echo "test";
+    }
     // Thêm chi tiết phiếu chấm công mới
     public function create()
     {
-        $model = new ChiTietPhieuChamCongModel();
 
+        $model = new ChiTietPhieuChamCongModel();
         $id_phieu_cham_cong = $this->request->getPost('id_phieu_cham_cong');
         $scores = $this->request->getPost('score'); // Mảng score[id_tieu_chi] => diem_so
+        echo "<pre> ID Phieu Cham Cong : <br/>";
+        print_r($id_phieu_cham_cong);
+        echo "</pre>";
 
+        echo "<pre> Scores : <br/>";
+        print_r($scores);
+        echo "</pre>";
         if ($scores && $id_phieu_cham_cong) {
             foreach ($scores as $id_noi_dung_danh_gia => $diem_so) {
                 $data = [
@@ -43,7 +52,7 @@ class ChiTietPhieuChamCongController extends Security_Controller
             }
         }
 
-        return redirect()->to('/chi_tiet_phieu_cham_cong')->with('success', 'Thêm chi tiết phiếu chấm công thành công!');
+        return redirect()->to('/evaluation_criteria')->with('success', 'Thêm chi tiết phiếu chấm công thành công!');
     }
     // Chỉnh sửa chi tiết phiếu chấm công
     public function edit($id)
