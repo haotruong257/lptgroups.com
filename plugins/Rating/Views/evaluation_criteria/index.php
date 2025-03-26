@@ -5,6 +5,7 @@
 
 <table class="table table-bordered">
     <thead>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <tr>
             <th rowspan="2">TIÊU CHÍ</th>
             <th rowspan="2">STT</th>
@@ -63,6 +64,21 @@
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>
+        <!-- Script để hiển thị popup -->
+        <?php if (session()->has('popup')): ?>
+            <?php $popup = session()->get('popup'); ?>
+            <script>
+                Swal.fire({
+                    icon: '<?= esc($popup['type']) ?>',
+                    title: '<?= esc($popup['title']) ?>',
+                    text: '<?= esc($popup['message']) ?>',
+                    timer: <?= $popup['duration'] ?>,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+            </script>
+        <?php endif; ?>
     </tbody>
 </table>
 

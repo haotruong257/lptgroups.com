@@ -16,19 +16,47 @@ class PhieuChamCongController extends Security_Controller
     // Danh sách phiếu chấm công
     public function index(): string
     {
+        $loginUserID =  $this->login_user->is_admin ? 0 : $this->login_user->id;
         $model = new PhieuChamCongModel();
-        $data['phieu_cham_cong'] = $model->get_all_phieu_cham_cong_with_users();
+        $data['phieu_cham_cong'] = $model->getPhieuChamCong($loginUserID);;
         return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
     }
 
     // Thêm phiếu chấm công mới
-    // Thêm phiếu chấm công mới
     public function create()
     {
         $model = new PhieuChamCongModel();
-
-        // Lấy user_id của người dùng hiện tại 
         $currentUserId = $this->Users_model->login_user_id();
+
+        $latestPhieu = $model->where('created_id', $currentUserId)
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        if ($latestPhieu) {
+            $latestMonth = date('Y-m', strtotime($latestPhieu['created_at']));
+            $currentMonth = date('Y-m');
+            if ($latestMonth === $currentMonth) {
+                $this->session->setFlashdata('popup', [
+                    'type' => 'warning',
+                    'title' => 'Nhắc nhở',
+                    'message' => 'Bạn đã tạo phiếu chấm công cho tháng ' . $currentMonth . ' rồi!',
+                    'duration' => 5000
+                ]);
+                return redirect()->to('/phieu_cham_cong');
+            }
+        }
+
+        // Lấy điểm số từ form trước
+        $scores = $this->request->getPost('score');
+        if (empty($scores) || !is_array($scores)) {
+            $this->session->setFlashdata('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Vui lòng chấm điểm ít nhất một tiêu chí.',
+                'duration' => 5000
+            ]);
+            return redirect()->to('/evaluation_criteria');
+        }
 
         // Dữ liệu cho bảng phieu_cham_cong
         $phieuData = [
@@ -36,21 +64,20 @@ class PhieuChamCongController extends Security_Controller
             'created_at' => date('Y-m-d H:i:s'),
             'approve_id' => $this->request->getPost('approve_id'),
             'approve_at' => $this->request->getPost('approve_at'),
-            'trang_thai' => 'pending', // Luôn là pending khi nhân viên gửi
-            'tong_diem' => 0 // Sẽ cập nhật sau khi lưu chi tiết
+            'trang_thai' => 'pending',
+            'tong_diem' => 0
         ];
-        echo "<pre> ID Phieu Cham Cong : <br/>";
-        print_r($phieuData);
-        echo "</pre>";
+
         // Lưu bản ghi vào bảng phieu_cham_cong
         $idPhieuChamCong = $model->add_phieu_cham_cong($phieuData);
         if (!$idPhieuChamCong) {
-            return redirect()->to('/phieu_cham_cong')->with('error', 'Không thể tạo phiếu chấm công.');
-        }
-        // // Lấy điểm số từ form
-        $scores = $this->request->getPost('score');
-        if (empty($scores)) {
-            return redirect()->to('/phieu_cham_cong')->with('error', 'Vui lòng chấm điểm ít nhất một tiêu chí.');
+            $this->session->setFlashdata('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Không thể tạo phiếu chấm công.',
+                'duration' => 5000
+            ]);
+            return redirect()->to('/phieu_cham_cong');
         }
 
         // Lưu chi tiết vào bảng chi_tiet_phieu_cham_cong
@@ -58,7 +85,7 @@ class PhieuChamCongController extends Security_Controller
         $tongDiem = 0;
         foreach ($scores as $idNoiDung => $diemSo) {
             if (!is_numeric($diemSo) || $diemSo < 1 || $diemSo > 5) {
-                continue; // Bỏ qua nếu điểm không hợp lệ
+                continue;
             }
 
             $chiTietData = [
@@ -68,16 +95,21 @@ class PhieuChamCongController extends Security_Controller
             ];
 
             if (!$chiTietModel->add_chi_tiet_phieu_cham_cong($chiTietData)) {
-                // Xử lý lỗi nếu có
                 return redirect()->to('/phieu_cham_cong')->with('error', 'Có lỗi khi lưu chi tiết phiếu chấm công.');
             }
         }
-        $tongDiem = $chiTietModel->calculate_total_score($idPhieuChamCong);
-        // Cập nhật tổng điểm vào bảng phieu_cham_cong
 
+        $tongDiem = $chiTietModel->calculate_total_score($idPhieuChamCong);
         $model->update_phieu_cham_cong(['tong_diem' => $tongDiem], $idPhieuChamCong);
 
-        // return redirect()->to('/phieu_cham_cong')->with('success', 'Thêm phiếu chấm công thành công!');
+        $this->session->setFlashdata('popup', [
+            'type' => 'success',
+            'title' => 'Thành công',
+            'icon' => "success",
+            'message' => 'Thêm phiếu chấm công thành công!',
+            'duration' => 5000
+        ]);
+        return redirect()->to('/phieu_cham_cong');
     }
     // Chỉnh sửa phiếu chấm công
     public function edit($id)
