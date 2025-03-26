@@ -5,11 +5,6 @@ namespace Config;
 $routes = Services::routes();
 
 $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
-    // Routes cho EvaluationController (giữ nguyên từ file gốc)
-    // $routes->get('rating', 'EvaluationController::index');
-    $routes->get('category', 'EvaluationController::categoryView');
-    // $routes->post('category/createCategory', 'EvaluationController::createCategory');
-
     // Routes cho EvaluationCriteriaCategoryController
     $routes->get('evaluation_criteria_category', 'EvaluationCriteriaCategoryController::index'); // Hiển thị danh sách danh mục tiêu chí
     $routes->post('evaluation_criteria_category/create', 'EvaluationCriteriaCategoryController::create'); // Thêm danh mục tiêu chí mới

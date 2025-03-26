@@ -15,7 +15,6 @@ class EvaluationCategoryModel extends Crud_model
         parent::__construct();
     }
 
-
     // Get all criteriaCategory 
     public function get_all_criteriaCategory()
     {
