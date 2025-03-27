@@ -18,7 +18,17 @@ class PhieuChamCongController extends Security_Controller
     {
         $loginUserID =  $this->login_user->is_admin ? 0 : $this->login_user->id;
         $model = new PhieuChamCongModel();
-        $data['phieu_cham_cong'] = $model->getPhieuChamCong($loginUserID);;
+        $searchName = $this->request->getGet("search");
+        $searchDate = $this->request->getGet("date");
+
+        if (!empty($searchName) || !empty($searchDate)) {
+            $data['phieu_cham_cong'] = $model->searchPhieuChamCong($searchName, $searchDate, $loginUserID);
+            $data['search'] = $searchName;
+            $data['date'] = $searchDate;
+        } else {
+            $data['phieu_cham_cong'] = $model->getPhieuChamCong($loginUserID);
+        }
+
         return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
     }
 

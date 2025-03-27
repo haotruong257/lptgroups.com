@@ -29,7 +29,7 @@ class ChiTietPhieuChamCongModel extends Crud_model
             evaluation_criteria_categories.name as category_name, 
             phieu_cham_cong.created_id, 
             phieu_cham_cong.created_at, 
-            users.first_name as employee_name');
+            CONCAT(users.first_name , " " ,users.last_name) as employee_name');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia', 'left');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories', 'evaluation_criteria_categories.id = evaluation_criteria.id_tieu_chi', 'left');
         $db_builder->join(get_db_prefix() . 'phieu_cham_cong', 'phieu_cham_cong.id = chi_tiet_phieu_cham_cong.id_phieu_cham_cong', 'left');
@@ -124,17 +124,17 @@ class ChiTietPhieuChamCongModel extends Crud_model
     public function get_details_with_criteria($id_phieu_cham_cong)
     {
         $db_builder = $this->db->table(get_db_prefix() . 'chi_tiet_phieu_cham_cong');
-        $db_builder->select('chi_tiet_phieu_cham_cong.*, 
+        $db_builder->select("chi_tiet_phieu_cham_cong.*, 
             evaluation_criteria.noi_dung, 
             evaluation_criteria.thu_tu_sap_xep, 
             evaluation_criteria.id_tieu_chi, 
             evaluation_criteria_categories.name as category_name, 
-            phieu_cham_cong.created_at, 
-            users.first_name as employee_name');
+            phieu_cham_cong.created_at,
+            CONCAT(u.first_name, ' ',u.last_name) as employee_name");
         $db_builder->join(get_db_prefix() . 'evaluation_criteria', 'evaluation_criteria.id = chi_tiet_phieu_cham_cong.id_noi_dung_danh_gia');
         $db_builder->join(get_db_prefix() . 'evaluation_criteria_categories', 'evaluation_criteria_categories.id = evaluation_criteria.id_tieu_chi', 'left');
         $db_builder->join(get_db_prefix() . 'phieu_cham_cong', 'phieu_cham_cong.id = chi_tiet_phieu_cham_cong.id_phieu_cham_cong', 'left');
-        $db_builder->join(get_db_prefix() . 'users', 'users.id = phieu_cham_cong.created_id', 'left');
+        $db_builder->join(get_db_prefix() . 'users as u', 'u.id = phieu_cham_cong.created_id', 'left');
         $db_builder->where('chi_tiet_phieu_cham_cong.id_phieu_cham_cong', $id_phieu_cham_cong);
         $db_builder->orderBy('evaluation_criteria.thu_tu_sap_xep', 'asc');
         return $db_builder->get()->getResultArray();

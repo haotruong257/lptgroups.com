@@ -9,7 +9,7 @@ class PhieuChamCongModel extends Model
 {
     protected $table = 'phieu_cham_cong';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['created_id', 'approve_id', 'approve_at', 'trang_thai', 'tong_diem'];
+    protected $allowedFields = ['created_id', 'created_at', 'approve_id', 'approve_at', 'trang_thai', 'tong_diem'];
 
     protected $db;
     public function __construct()
@@ -105,6 +105,43 @@ class PhieuChamCongModel extends Model
         $db_builder->orderBy('phieu_cham_cong.id', 'desc');
         $response = $db_builder->get()->getResultArray();
         log_message('debug', 'Không tìm thấy phiếu chấm công nào cho userID: ' . $userID);
+        return $response;
+    }
+
+    public function searchPhieuChamCong(string $searchName = '', string $searchDate = '', int $userID = 0)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'phieu_cham_cong');
+        $db_builder->select(get_db_prefix() . "phieu_cham_cong.*, CONCAT(u.first_name, ' ', u.last_name) as created_name")
+            ->join(get_db_prefix() . 'users as u', 'u.id = phieu_cham_cong.created_id', 'left');
+
+        if ($userID > 0) {
+            $db_builder->where('phieu_cham_cong.created_id', $userID);
+        }
+
+        // Tìm kiếm theo tên
+        if (!empty($searchName)) {
+            $db_builder->groupStart()
+                ->like('u.first_name', $searchName)
+                ->orLike('u.last_name', $searchName)
+                ->orLike("CONCAT(u.first_name, ' ', u.last_name)", $searchName)
+                ->groupEnd();
+        }
+
+        // Tìm kiếm theo ngày (created_at)
+        if (!empty($searchDate)) {
+            // Lấy phần YYYY-MM từ searchDate
+            $yearMonth = substr($searchDate, 0, 7); // Ví dụ: '2025-03'
+            $db_builder->like('phieu_cham_cong.created_at', $yearMonth);
+            // Loại bỏ các bản ghi có created_at rỗng hoặc null
+            $db_builder->where('phieu_cham_cong.created_at IS NOT NULL');
+        }
+        $db_builder->orderBy('phieu_cham_cong.id', 'desc');
+        $response = $db_builder->get()->getResultArray();
+
+        if (empty($response)) {
+            log_message('debug', 'Không tìm thấy phiếu chấm công nào cho userID: ' . $userID . ' với tên: ' . $searchName . ' và ngày: ' . $searchDate);
+        }
+
         return $response;
     }
 }
