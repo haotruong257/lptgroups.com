@@ -8,6 +8,8 @@ $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     // Routes cho EvaluationController (giữ nguyên từ file gốc)
     // $routes->get('rating', 'EvaluationController::index');
     $routes->get('category', 'EvaluationController::categoryView');
+    $routes->get('rating', 'MainController::index'); 
+
     // $routes->post('category/createCategory', 'EvaluationController::createCategory');
 
     // Routes cho EvaluationCriteriaCategoryController

@@ -30,7 +30,7 @@ if (!function_exists('rating_left_menu')) {
                 // Thêm menu vào sidebar
                 $sidebar_menu["rating"] = array(
                         "name" => "Rating",  // Hiển thị chữ "Rating"
-                        "url" => "evaluation_criteria",   // Đường dẫn
+                        "url" => "rating",   // Đường dẫn
                         "class" => "star",   // Icon (thử dùng icon hợp lệ)
                         "position" => 6,
                 );

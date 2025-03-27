@@ -77,7 +77,7 @@
                     <a href="<?= get_uri('/phieu_cham_cong') ?>" class="btn btn-info">Xóa bộ lọc</a>
                 <?php endif; ?>
             </form>
-
+            <a href=" <?= get_uri("phieu_cham_cong/create"); ?>" class="btn btn-secondary mb-3">Thêm danh sách phiếu chấm công</a>
             <?php if (isset($phieu_cham_cong) && !empty($phieu_cham_cong)): ?>
                 <table class="table table-bordered ">
                     <thead>
