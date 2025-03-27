@@ -37,7 +37,7 @@
                         <th>STT</th>
                         <th>NỘI DUNG ĐÁNH GIÁ</th>
                         <th>ĐIỂM</th>
-                        <th>HÀNH ĐỘNG</th>
+                        <!-- <th>HÀNH ĐỘNG</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -67,10 +67,10 @@
                                     <td><?= esc($row['thu_tu_sap_xep']) ?></td>
                                     <td><?= !empty($row['noi_dung']) ? nl2br(esc($row['noi_dung'])) : '<em>Chưa có nội dung</em>' ?></td>
                                     <td class="text-center"><?= esc($row['diem_so']) ?></td>
-                                    <td>
+                                    <!-- <td>
                                         <a href="<?= base_url('chi_tiet_phieu_cham_cong/edit/' . $row['id']) ?>" class="btn btn-sm btn-warning">Sửa</a>
                                         <a href="<?= base_url('chi_tiet_phieu_cham_cong/delete/' . $row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa chi tiết này?')">Xóa</a>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             <?php endforeach; ?>
                         <?php endforeach; ?>

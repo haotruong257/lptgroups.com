@@ -59,10 +59,20 @@
                         <td><?= esc($attendance['trang_thai'] ?: 'Chưa xác định') ?></td>
                         <td><?= esc($attendance['tong_diem'] ?? '0') ?></td>
                         <td><?= esc($attendance['created_name']) ?></td>
-                        <td>
-                            <button class="btn btn-info">Cập nhật</button>
 
-                            <button class="btn btn-danger">Xóa</button>
+                        <td>
+                            <?php if (is_admin()) { ?>
+                                <a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-primary">Xem</a>
+                                <button class="btn btn-primary">Duyệt</button>
+                            <?php } else { ?>
+                                <?php if ($attendance['trang_thai'] === 'pending'): ?>
+                                    <button class="btn btn-info">Cập nhật</button>
+                                <?php elseif ($attendance['trang_thai'] === 'approve'): ?>
+                                    <button class="btn btn-primary">Xem</button>
+                                <?php endif; ?>
+                                <!-- Nút Xóa giữ nguyên cho mọi trạng thái -->
+                                <button class="btn btn-danger">Xóa</button>
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
