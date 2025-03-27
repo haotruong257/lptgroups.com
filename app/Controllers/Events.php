@@ -4,17 +4,20 @@ namespace App\Controllers;
 
 use App\Libraries\Google_calendar_events;
 
-class Events extends Security_Controller {
+class Events extends Security_Controller
+{
 
     private $Google_calendar_events;
 
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
         $this->Google_calendar_events = new Google_calendar_events();
     }
 
     //load calendar view
-    function index($encrypted_event_id = "") {
+    function index($encrypted_event_id = "")
+    {
         if ($this->login_user->user_type === "staff") {
             $this->check_module_availability("module_event");
         } else {
@@ -29,13 +32,15 @@ class Events extends Security_Controller {
         return $this->template->rander("events/index", $view_data);
     }
 
-    private function can_share_events() {
+    private function can_share_events()
+    {
         if ($this->login_user->user_type === "staff") {
             return get_array_value($this->login_user->permissions, "disable_event_sharing") == "1" ? false : true;
         }
     }
 
-    function get_sharing_options_view($return_json = false, $model_info = null) {
+    function get_sharing_options_view($return_json = false, $model_info = null)
+    {
 
         $view_data["id"] =  isset($model_info->id) ? $model_info->id : $this->request->getPost('id');
         $view_data["client_id"] =  isset($model_info->client_id) ? $model_info->client_id : $this->request->getPost('client_id');
@@ -55,7 +60,8 @@ class Events extends Security_Controller {
     }
 
     //show add/edit event modal form
-    function modal_form() {
+    function modal_form()
+    {
         $encrypted_event_id = $this->request->getPost('encrypted_event_id');
         if (!$encrypted_event_id) {
             $encrypted_event_id = "";
@@ -103,17 +109,20 @@ class Events extends Security_Controller {
         return $this->template->view('events/modal_form', $view_data);
     }
 
-    function _can_access_clients() {
+    function _can_access_clients()
+    {
         $client_access_info = $this->get_access_info("client");
         return $this->login_user->is_admin || $client_access_info->access_type == "all";
     }
 
-    function get_members_and_teams_dropdown() {
+    function get_members_and_teams_dropdown()
+    {
         return json_encode(get_team_members_and_teams_select2_data_list(true));
     }
 
     //save an event
-    function save() {
+    function save()
+    {
         $type = $this->request->getPost('type');
         $validation_array = array(
             "id" => "numeric",
@@ -297,7 +306,8 @@ class Events extends Security_Controller {
     }
 
     //delete/undo an event
-    function delete() {
+    function delete()
+    {
         $id = $this->request->getPost('id'); //reminder
         if (!$id) { //event
             $this->validate_submitted_data(array(
@@ -341,7 +351,8 @@ class Events extends Security_Controller {
     }
 
     //get calendar event
-    function calendar_events($filter_values = "", $event_label_id = 0, $client_id = 0) {
+    function calendar_events($filter_values = "", $event_label_id = 0, $client_id = 0)
+    {
         $start = $_GET["start"];
         $end = $_GET["end"];
 
@@ -474,7 +485,8 @@ class Events extends Security_Controller {
     }
 
     //prepare calendar event
-    private function _make_calendar_event($data) {
+    private function _make_calendar_event($data)
+    {
 
         $end_time = $data->end_time;
         if ($data->start_date != $data->end_date && $end_time == "00:00:00") {
@@ -497,7 +509,8 @@ class Events extends Security_Controller {
     }
 
     //prepare approved leave event
-    private function _make_leave_event($data) {
+    private function _make_leave_event($data)
+    {
 
         return array(
             "title" => $data->applicant_name,
@@ -515,7 +528,8 @@ class Events extends Security_Controller {
     }
 
     //prepare project deadline event
-    private function _make_project_event($data, $start_date_event = false) {
+    private function _make_project_event($data, $start_date_event = false)
+    {
         $color = "#1ccacc"; //future events
         $my_local_time = get_my_local_time("Y-m-d");
         if (($data->deadline && ($my_local_time > $data->deadline)) || (!$data->deadline && $data->start_date && ($my_local_time > $data->start_date))) { //back-dated events
@@ -548,7 +562,8 @@ class Events extends Security_Controller {
     }
 
     //prepare task deadline event
-    private function _make_task_event($data, $start_date_event = false) {
+    private function _make_task_event($data, $start_date_event = false)
+    {
         $event_type = "task_deadline";
         $event_custom_class = "event-deadline-border";
 
@@ -585,7 +600,8 @@ class Events extends Security_Controller {
     }
 
     //view an evnet
-    function view() {
+    function view()
+    {
         $encrypted_event_id = $this->request->getPost('id');
         $cycle = $this->request->getPost('cycle');
 
@@ -605,7 +621,8 @@ class Events extends Security_Controller {
         return $this->template->view('events/view', $view_data);
     }
 
-    private function _make_view_data($encrypted_event_id, $cycle = "0") {
+    private function _make_view_data($encrypted_event_id, $cycle = "0")
+    {
         $event_id = decode_id($encrypted_event_id, "event_id");
         validate_numeric_value($event_id);
         validate_numeric_value($cycle);
@@ -670,7 +687,8 @@ class Events extends Security_Controller {
         }
     }
 
-    private function _get_confirmed_and_rejected_users_list($confirmed_by_array, $rejected_by_array) {
+    private function _get_confirmed_and_rejected_users_list($confirmed_by_array, $rejected_by_array)
+    {
 
         $confirmed_by = "";
         $rejected_by = "";
@@ -698,7 +716,8 @@ class Events extends Security_Controller {
         return array("confirmed_by" => $confirmed_by, "rejected_by" => $rejected_by);
     }
 
-    function save_event_status() {
+    function save_event_status()
+    {
         $encrypted_event_id = $this->request->getPost('encrypted_event_id');
         $event_id = decode_id($encrypted_event_id, "event_id");
         validate_numeric_value($event_id);
@@ -714,7 +733,8 @@ class Events extends Security_Controller {
     }
 
     //get all contacts of a selected client
-    function get_all_contacts_of_client($client_id) {
+    function get_all_contacts_of_client($client_id)
+    {
         validate_numeric_value($client_id);
 
         if ($client_id && $this->_can_access_clients()) {
@@ -730,7 +750,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function google_calendar_settings_modal_form() {
+    function google_calendar_settings_modal_form()
+    {
         if (get_setting("enable_google_calendar_api") && (get_setting("google_calendar_authorized") || get_setting('user_' . $this->login_user->id . '_google_calendar_authorized'))) {
             $user_calendar_ids = get_setting('user_' . $this->login_user->id . '_calendar_ids');
             $calendar_ids = $user_calendar_ids ? unserialize($user_calendar_ids) : array();
@@ -739,7 +760,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function save_google_calendar_settings() {
+    function save_google_calendar_settings()
+    {
         if (get_setting("enable_google_calendar_api") && (get_setting("google_calendar_authorized") || get_setting('user_' . $this->login_user->id . '_google_calendar_authorized'))) {
             $integrate_with_google_calendar = $this->request->getPost("integrate_with_google_calendar");
             $integrate_with_google_calendar = clean_data($integrate_with_google_calendar);
@@ -766,7 +788,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function show_event_in_google_calendar($google_event_id = "") {
+    function show_event_in_google_calendar($google_event_id = "")
+    {
         if (!$google_event_id) {
             show_404();
         }
@@ -775,7 +798,8 @@ class Events extends Security_Controller {
         $event_link ? app_redirect($event_link, true) : show_404();
     }
 
-    function file_preview($id = "", $key = "") {
+    function file_preview($id = "", $key = "")
+    {
         if ($id) {
             validate_numeric_value($id);
             $event_info = $this->Events_model->get_one($id);
@@ -800,7 +824,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function reminders() {
+    function reminders()
+    {
         $this->can_create_reminders();
         $view_data["project_id"] = $this->request->getPost("project_id");
         $view_data["client_id"] = $this->request->getPost("client_id");
@@ -810,7 +835,8 @@ class Events extends Security_Controller {
         return $this->template->view("reminders/index", $view_data);
     }
 
-    function reminders_list_data($type = "", $reminder_context = "", $reminder_context_id = 0) {
+    function reminders_list_data($type = "", $reminder_context = "", $reminder_context_id = 0)
+    {
         validate_numeric_value($reminder_context_id);
         $this->can_create_reminders();
 
@@ -838,7 +864,8 @@ class Events extends Security_Controller {
         echo json_encode(array("data" => $result));
     }
 
-    private function _make_reminder_row($data = array()) {
+    private function _make_reminder_row($data = array())
+    {
         $reminder_status_value = "done";
 
         if ($data->reminder_status === "done" || $data->reminder_status === "shown") {
@@ -910,7 +937,8 @@ class Events extends Security_Controller {
         );
     }
 
-    private function can_access_this_reminder($reminder_info) {
+    private function can_access_this_reminder($reminder_info)
+    {
         if ($reminder_info->created_by === $this->login_user->id) {
             //this user is the creator of the event/reminder
             return true;
@@ -930,7 +958,8 @@ class Events extends Security_Controller {
         app_redirect("forbidden");
     }
 
-    private function can_create_reminders() {
+    private function can_create_reminders()
+    {
         if (get_setting("module_reminder") && ($this->login_user->user_type === "staff" || ($this->login_user->user_type === "client" && get_setting("client_can_create_reminders")))) {
             return true;
         }
@@ -938,7 +967,8 @@ class Events extends Security_Controller {
         app_redirect("forbidden");
     }
 
-    function save_reminder_status($id = 0, $status = "") {
+    function save_reminder_status($id = 0, $status = "")
+    {
         $this->can_create_reminders();
         if (!$id) {
             show_404();
@@ -986,7 +1016,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function snooze_reminder() {
+    function snooze_reminder()
+    {
         $this->can_create_reminders();
         $this->validate_submitted_data(array(
             "id" => "required|numeric"
@@ -1021,7 +1052,8 @@ class Events extends Security_Controller {
         }
     }
 
-    function reminder_view() {
+    function reminder_view()
+    {
         $this->can_create_reminders();
         $this->validate_submitted_data(array(
             "id" => "required|numeric"
@@ -1037,12 +1069,14 @@ class Events extends Security_Controller {
         return $this->template->view("reminders/view", $view_data);
     }
 
-    function get_reminders_for_current_user() {
+    function get_reminders_for_current_user()
+    {
         $this->can_create_reminders();
         echo json_encode(array("success" => true, "reminders" => reminders_widget(true)));
     }
 
-    function count_missed_reminders() {
+    function count_missed_reminders()
+    {
         $this->can_create_reminders();
         $reminders = $this->Events_model->count_missed_reminders($this->login_user->id, $this->login_user->notification_checked_at);
         echo json_encode(array("success" => true, 'total_reminders' => $reminders));

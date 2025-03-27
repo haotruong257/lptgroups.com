@@ -1,5 +1,4 @@
 <h2>Chấm điểm nhân viên</h2>
-<a href="<?= base_url('/evaluation_criteria') ?>">Quay lại</a>
 <h2><?php echo app_lang("list_criteria"); ?></h2>
 <?php echo form_open(get_uri("phieu_cham_cong/create"), array("id" => "phieu-cham-cong", "class" => "general-form", "role" => "form")); ?>
 

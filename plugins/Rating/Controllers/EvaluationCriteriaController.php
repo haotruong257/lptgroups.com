@@ -4,6 +4,7 @@ namespace Rating\Controllers;
 
 use App\Controllers\Security_Controller;
 use Rating\Models\EvaluationCriteriaModel;
+use Rating\Models\PhieuChamCongModel;
 
 class EvaluationCriteriaController extends Security_Controller
 {
@@ -15,9 +16,16 @@ class EvaluationCriteriaController extends Security_Controller
     // Danh sách tiêu chí kèm danh mục
     public function index(): string
     {
+
+        $model = new PhieuChamCongModel();
+        $data['phieu_cham_cong'] = $model->getPhieuChamCong();
         $model = new EvaluationCriteriaModel();
         $data['criteria'] = $model->get_all_criteria_with_category();
-        return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
+        if ($this->login_user->is_admin) {
+            return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
+        } else {
+            return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
+        }
     }
 
     // Thêm tiêu chí mới

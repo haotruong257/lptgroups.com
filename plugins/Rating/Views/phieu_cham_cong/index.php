@@ -2,7 +2,10 @@
 <html>
 
 <head>
-    <title>Danh sách phiếu chấm công</title>
+    <title>Danh sách phiếu chấm công </title>
+    <?php if (is_admin()) { ?>
+        <h1>Heheheheh</h1>
+    <?php } ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         table {
