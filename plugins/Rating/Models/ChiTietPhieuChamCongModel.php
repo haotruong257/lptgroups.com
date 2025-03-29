@@ -115,7 +115,6 @@ class ChiTietPhieuChamCongModel extends Crud_model
         if ($this->db->affectedRows() > 0) {
             return true;
         }
-
         return false;
     }
 

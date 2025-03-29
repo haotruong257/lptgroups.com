@@ -75,7 +75,7 @@ class PhieuChamCongController extends Security_Controller
             'created_at' => date('Y-m-d H:i:s'),
             'approve_id' => $this->request->getPost('approve_id'),
             'approve_at' => $this->request->getPost('approve_at'),
-            'trang_thai' => StatusEnum::PENDING,
+            'trang_thai' => StatusEnum::PENDING->value,
             'tong_diem' => 0
         ];
 

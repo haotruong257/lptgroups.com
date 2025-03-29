@@ -31,7 +31,7 @@ $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     $routes->post('phieu_cham_cong/create', 'PhieuChamCongController::create'); // Thêm phiếu chấm công mới
     $routes->get('phieu_cham_cong/edit/(:num)', 'PhieuChamCongController::edit/$1'); // Hiển thị form chỉnh sửa phiếu
     $routes->post('phieu_cham_cong/update/(:num)', 'PhieuChamCongController::update/$1'); // Cập nhật phiếu
-    $routes->get('phieu_cham_cong/delete/(:num)', 'PhieuChamCongController::delete/$1'); // Xóa phiếu
+    $routes->post('phieu_cham_cong/delete/(:num)', 'PhieuChamCongController::delete/$1'); // Xóa phiếu
 
     // Routes cho ChiTietPhieuChamCongController
     $routes->get('chi_tiet_phieu_cham_cong', 'ChiTietPhieuChamCongController::index'); // Hiển thị danh sách chi tiết phiếu chấm công
@@ -39,5 +39,5 @@ $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     $routes->post('chi_tiet_phieu_cham_cong/create', 'ChiTietPhieuChamCongController::create'); // Thêm chi tiết phiếu chấm công mới
     $routes->get('chi_tiet_phieu_cham_cong/edit/(:num)', 'ChiTietPhieuChamCongController::edit/$1'); // Hiển thị form chỉnh sửa chi tiết
     $routes->post('chi_tiet_phieu_cham_cong/update/(:num)', 'ChiTietPhieuChamCongController::update/$1'); // Cập nhật chi tiết
-    $routes->get('chi_tiet_phieu_cham_cong/delete/(:num)', 'ChiTietPhieuChamCongController::delete/$1'); // Xóa chi tiết
+    $routes->post('chi_tiet_phieu_cham_cong/delete/(:num)', 'ChiTietPhieuChamCongController::delete/$1'); // Xóa chi tiết
 });

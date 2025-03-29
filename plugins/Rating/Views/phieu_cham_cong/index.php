@@ -80,7 +80,9 @@ use Rating\Helpers\StatusEnum;
  if (isset($search) || isset($date)): ?>
                     <a href="<?= get_uri('/phieu_cham_cong') ?>" class="btn btn-info">Xóa bộ lọc</a>
                 <?php endif; ?>
+                <?php if (!is_admin()): ?>
                 <a href=" <?= get_uri("evaluation_criteria"); ?>" class="btn btn-info"> + Thêm phiếu chấm công</a>
+                <?php endif; ?>
             </form>
             <?php if (isset($phieu_cham_cong) && !empty($phieu_cham_cong)): ?>
                 <table class="table table-bordered ">
@@ -126,12 +128,14 @@ use Rating\Helpers\StatusEnum;
                                         </form>
                                         <?php endif; ?>
                                     <?php else: ?>
-                                        <?php if ($attendance['trang_thai'] === 'pending'): ?>
+                                        <?php if ($attendance['trang_thai'] === StatusEnum::PENDING->value): ?>
                                             <button class="btn btn-info">Cập nhật</button>
-                                        <?php elseif ($attendance['trang_thai'] === 'approve'): ?>
+                                        <?php elseif ($attendance['trang_thai'] === StatusEnum::APPROVED): ?>
                                             <button class="btn btn-primary">Xem</button>
                                         <?php endif; ?>
-                                        <button class="btn btn-danger">Xóa</button>
+                                        <form action="<?= get_uri("phieu_cham_cong/delete/" . $attendance['id']); ?>" method="POST" style="display:inline;">
+                                                <button type="submit" class="btn btn-danger">Xóa</button>
+                                        </form>
                                     <?php endif; ?>
                                 </td>
                             </tr>

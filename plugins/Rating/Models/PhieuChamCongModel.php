@@ -63,19 +63,19 @@ class PhieuChamCongModel extends Model
         return false;
     }
 
-    // // Delete phieu_cham_cong
-    // public function delete_phieu_cham_cong($id)
-    // {
-    //     $db_builder = $this->db->table(get_db_prefix() . 'phieu_cham_cong');
-    //     $db_builder->where('id', $id);
-    //     $db_builder->delete();
+    // Delete phieu_cham_cong
+    public function delete_phieu_cham_cong($id)
+    {
+        $db_builder = $this->db->table(get_db_prefix() . 'phieu_cham_cong');
+        $db_builder->where('id', $id);
+        $db_builder->delete();
 
-    //     if ($this->db->affectedRows() > 0) {
-    //         return true;
-    //     }
+        if ($this->db->affectedRows() > 0) {
+            return true;
+        }
 
-    //     return false;
-    // }
+        return false;
+    }
 
     // Get all phieu_cham_cong with user info (join with user table)
     // public function get_all_phieu_cham_cong_with_users(bool $is_admin = false)

@@ -159,7 +159,6 @@ use Rating\Helpers\StatusEnum;
                                     <td><?= esc($row['employee_name'] ?? 'Không xác định') ?></td>
                                     <td><?= !empty($row['created_at']) ? date('d/m/Y H:i:s', strtotime($row['created_at'])) : 'Không xác định' ?></td>
                                     <td>
-                                        <a href="<?= base_url('chi_tiet_phieu_cham_cong/edit/' . $row['id']) ?>" class="btn btn-sm btn-warning">Sửa</a>
                                         <a href="<?= base_url('chi_tiet_phieu_cham_cong/delete/' . $row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa chi tiết này?')">Xóa</a>
                                     </td>
                                 </tr>
