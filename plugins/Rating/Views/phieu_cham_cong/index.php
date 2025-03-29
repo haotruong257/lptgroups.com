@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -64,6 +65,7 @@
 </head>
 
 <body>
+    
     <section class="page-wrapper clearfix">
         <div class="card px-3 py-2">
             <h2>Danh sách phiếu chấm công</h2>
@@ -73,11 +75,13 @@
                 <input type="text" name="search" placeholder="Tìm theo tên người tạo..." value="<?= esc($search ?? '') ?>">
                 <input type="date" name="date" value="<?= esc($date ?? '') ?>">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <?php if (isset($search) || isset($date)): ?>
+                <?php
+use Rating\Helpers\StatusEnum;
+ if (isset($search) || isset($date)): ?>
                     <a href="<?= get_uri('/phieu_cham_cong') ?>" class="btn btn-info">Xóa bộ lọc</a>
                 <?php endif; ?>
+                <a href=" <?= get_uri("evaluation_criteria"); ?>" class="btn btn-info"> + Thêm phiếu chấm công</a>
             </form>
-            <a href=" <?= get_uri("phieu_cham_cong/create"); ?>" class="btn btn-secondary mb-3">Thêm danh sách phiếu chấm công</a>
             <?php if (isset($phieu_cham_cong) && !empty($phieu_cham_cong)): ?>
                 <table class="table table-bordered ">
                     <thead>
@@ -106,9 +110,21 @@
                                 <td><?= esc($attendance['created_name']) ?></td>
                                 <td class="d-flex gap-2 w-100 justify-content-center">
                                     <?php if (is_admin()): ?>
-                                        <a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-primary">Xem</a>
-                                        <button class="btn btn-success">Duyệt</button>
-                                        <a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-danger">Từ chối</a>
+                                        <a href="<?= get_uri(uri: "chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-primary">Xem</a>
+                                        <?php if (empty($attendance['trang_thai']) || $attendance['trang_thai'] === StatusEnum::PENDING->value): ?> 
+                                        <form action="<?= get_uri("phieu_cham_cong/update/" . $attendance['id']); ?>" method="POST" style="display:inline;">
+                                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::APPROVED->value ?>">
+                                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
+                                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
+                                                <button type="submit" class="btn btn-success">Duyệt</button>
+                                        </form>
+                                        <form action="<?= get_uri("phieu_cham_cong/update/" . $attendance['id']); ?>" method="POST" style="display:inline;">
+                                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::REJECTED->value ?>">
+                                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
+                                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
+                                                <button type="submit" class="btn btn-danger">Từ chối</button>
+                                        </form>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <?php if ($attendance['trang_thai'] === 'pending'): ?>
                                             <button class="btn btn-info">Cập nhật</button>

@@ -103,7 +103,6 @@ class ChiTietPhieuChamCongModel extends Crud_model
         if ($this->db->affectedRows() > 0) {
             return true;
         }
-
         return false;
     }
     // Delete chi_tiet_phieu_cham_cong

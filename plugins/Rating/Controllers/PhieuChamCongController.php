@@ -3,6 +3,7 @@
 namespace Rating\Controllers;
 
 use App\Controllers\Security_Controller;
+use Rating\Helpers\StatusEnum;
 use Rating\Models\ChiTietPhieuChamCongModel;
 use Rating\Models\PhieuChamCongModel;
 
@@ -74,7 +75,7 @@ class PhieuChamCongController extends Security_Controller
             'created_at' => date('Y-m-d H:i:s'),
             'approve_id' => $this->request->getPost('approve_id'),
             'approve_at' => $this->request->getPost('approve_at'),
-            'trang_thai' => 'pending',
+            'trang_thai' => StatusEnum::PENDING,
             'tong_diem' => 0
         ];
 
@@ -119,8 +120,9 @@ class PhieuChamCongController extends Security_Controller
             'message' => 'Thêm phiếu chấm công thành công!',
             'duration' => 5000
         ]);
-        return redirect()->to('/phieu_cham_cong');
+        return redirect()->to(uri: '/phieu_cham_cong');
     }
+
     // Chỉnh sửa phiếu chấm công
     public function edit($id)
     {
@@ -132,17 +134,53 @@ class PhieuChamCongController extends Security_Controller
     public function update($id)
     {
         $model = new PhieuChamCongModel();
+        // Lấy tất cả dữ liệu từ POST
+        $input = $this->request->getPost();
 
-        $data = [
-            'created_id' => $this->request->getPost('created_id'),
-            'approve_id' => $this->request->getPost('approve_id'),
-            'approve_at' => $this->request->getPost('approve_at'),
-            'trang_thai' => $this->request->getPost('trang_thai'),
-            'tong_diem' => $this->request->getPost('tong_diem')
-        ];
+        // Danh sách các field hợp lệ (nên lấy từ model nếu có)
+        $allowedFields = ['created_id', 'approve_id', 'approve_at', 'trang_thai', 'tong_diem'];
 
-        $model->update_phieu_cham_cong($data, $id);
-        return redirect()->to('/phieu_cham_cong')->with('success', 'Cập nhật phiếu chấm công thành công!');
+        // Tạo mảng dữ liệu để cập nhật
+        $data = [];
+
+        // Xử lý từng field trong input
+        foreach ($input as $key => $value) {
+            $data[$key] = $value;
+            // if (in_array($key, $allowedFields)) {
+            //     if ($key === 'trang_thai') {
+            //         try {
+            //             // Chuyển đổi giá trị trang_thai sang StatusEnum
+            //             $trangThai = StatusEnum::from($value);
+            //             $data['trang_thai'] = $trangThai->value;
+            //         } catch (\ValueError $e) {
+            //             return redirect()->back()->with('error', 'Trạng thái không hợp lệ: ' . $e->getMessage());
+            //         }
+            //     } else {
+            //         $data[$key] = $value;
+            //     }
+            // }
+        }
+        // Nếu không có dữ liệu để cập nhật
+        if (empty($data)) {
+            return redirect()->back()->with('error', 'Không có dữ liệu để cập nhật.');
+        }
+        // Cập nhật dữ liệu
+        if ($model->update_phieu_cham_cong($data, $id)) {
+            return redirect()->to('/phieu_cham_cong')->with('success', 'Cập nhật thành công!');
+        } else {
+            return redirect()->back()->with('error', 'Cập nhật thất bại.');
+        } 
+
+        // $data = [
+        //     'created_id' => $this->request->getPost('created_id'),
+        //     'approve_id' => $this->request->getPost('approve_id'),
+        //     'approve_at' => $this->request->getPost('approve_at'),
+        //     'trang_thai' => $this->request->getPost('trang_thai'),
+        //     'tong_diem' => $this->request->getPost('tong_diem')
+        // ];
+
+        // $model->update_phieu_cham_cong($data, $id);
+        // return redirect()->to('/phieu_cham_cong')->with('success', 'Cập nhật phiếu chấm công thành công!');
     }
 
     // Xóa phiếu chấm công

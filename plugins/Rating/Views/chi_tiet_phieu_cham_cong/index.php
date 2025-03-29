@@ -30,7 +30,11 @@
     <section class="page-wrapper clearfix">
         <div class="card px-3 py-2">
 
-            <?php if (session()->has('success')): ?>
+            <?php
+
+use Rating\Helpers\StatusEnum;
+
+ if (session()->has('success')): ?>
                 <div class="alert alert-success"><?= session('success') ?></div>
             <?php endif; ?>
             <?php if (session()->has('error')): ?>
@@ -50,13 +54,24 @@
                         <?php if (!empty($details)): ?>
                             <p><strong>Người tạo:</strong> <?= esc($details[0]['employee_name'] ?? 'Không xác định') ?></p>
                             <p><strong>Ngày tạo:</strong> <?= !empty($details[0]['created_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['created_at'])) : 'Không xác định' ?></p>
-                        <?php endif; ?>
+                            <p><strong>Trạng thái phiếu:</strong> <?= esc($details[0]['trang_thai'] ?? 'Chưa xác định') ?></p>
+                            <?php endif; ?>
                         <div class="d-flex w-100 gap-3">
                             <?php if (isset($tong_diem)): ?>
                                 <h4>Tổng điểm: <?= esc($tong_diem) ?></h4>
                             <?php endif; ?>
-                            <button class=" btn btn-success">Duyệt</button>
-                            <button class=" btn btn-danger">Từ chối</button>
+                            <form action="<?= get_uri("phieu_cham_cong/update/" . esc($id_phieu_cham_cong)); ?>" method="POST" style="display:inline;">
+                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::APPROVED->value ?>">
+                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
+                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
+                                <button type="submit" class="btn btn-success">Duyệt</button>
+                            </form>
+                            <form action="<?= get_uri("phieu_cham_cong/update/" . esc($id_phieu_cham_cong)); ?>" method="POST" style="display:inline;">
+                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::REJECTED->value ?>">
+                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
+                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
+                                <button type="submit" class="btn btn-danger">Từ Chối</button>
+                            </form>     
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,9 @@
     <section class="page-wrapper clearfix">
         <div class="card px-3 py-2">
             <h2 class="mb-3">Chấm điểm nhân viên</h2>
+            <div class="">
+                            <a href=" <?= get_uri("phieu_cham_cong/"); ?>" class="btn btn-secondary mb-3">Quay lại danh sách phiếu chấm công</a>
+            </div>
             <h3><?php echo app_lang("list_criteria"); ?></h3>
 
             <?php echo form_open(get_uri("phieu_cham_cong/create"), array("id" => "phieu-cham-cong", "class" => "general-form", "role" => "form")); ?>
