@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         table {
             border-collapse: collapse;
@@ -30,11 +31,7 @@
     <section class="page-wrapper clearfix">
         <div class="card px-3 py-2">
 
-            <?php
-
-use Rating\Helpers\StatusEnum;
-
- if (session()->has('success')): ?>
+            <?php if (session()->has('success')): ?>
                 <div class="alert alert-success"><?= session('success') ?></div>
             <?php endif; ?>
             <?php if (session()->has('error')): ?>
@@ -54,29 +51,19 @@ use Rating\Helpers\StatusEnum;
                         <?php if (!empty($details)): ?>
                             <p><strong>Người tạo:</strong> <?= esc($details[0]['employee_name'] ?? 'Không xác định') ?></p>
                             <p><strong>Ngày tạo:</strong> <?= !empty($details[0]['created_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['created_at'])) : 'Không xác định' ?></p>
-                            <p><strong>Trạng thái phiếu:</strong> <?= esc($details[0]['trang_thai'] ?? 'Chưa xác định') ?></p>
+                            <!-- <p><strong>Trạng Thái: </strong><?= esc($trang_thai)?></p>  -->
                             <?php endif; ?>
                         <div class="d-flex w-100 gap-3">
                             <?php if (isset($tong_diem)): ?>
                                 <h4>Tổng điểm: <?= esc($tong_diem) ?></h4>
                             <?php endif; ?>
-                            <form action="<?= get_uri("phieu_cham_cong/update/" . esc($id_phieu_cham_cong)); ?>" method="POST" style="display:inline;">
-                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::APPROVED->value ?>">
-                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
-                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
-                                <button type="submit" class="btn btn-success">Duyệt</button>
-                            </form>
-                            <form action="<?= get_uri("phieu_cham_cong/update/" . esc($id_phieu_cham_cong)); ?>" method="POST" style="display:inline;">
-                                <input type="hidden" name="trang_thai" value="<?= StatusEnum::REJECTED->value ?>">
-                                <input type="hidden" name="approve_id" value="<?= get_staff_user_id() ?>">
-                                <input type="hidden" name="approve_at" value="<?= date('Y-m-d H:i:s') ?>">
-                                <button type="submit" class="btn btn-danger">Từ Chối</button>
-                            </form>     
+                            <?php if($trang_thai == 1 || $trang_thai == null): ?>
+                            <a href="#" class="btn btn-success approve-btn" data-id="<?= esc($id_phieu_cham_cong) ?>">Duyệt</a>
+                            <a href="#" class="btn btn-danger reject-btn" data-id="<?= esc($id_phieu_cham_cong) ?>">Từ chối</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
-
-
                 <table class=" table-responsive table-bordered border-secondary ">
                     <thead>
                         <tr>
@@ -159,6 +146,7 @@ use Rating\Helpers\StatusEnum;
                                     <td><?= esc($row['employee_name'] ?? 'Không xác định') ?></td>
                                     <td><?= !empty($row['created_at']) ? date('d/m/Y H:i:s', strtotime($row['created_at'])) : 'Không xác định' ?></td>
                                     <td>
+                                        <a href="<?= base_url('chi_tiet_phieu_cham_cong/edit/' . $row['id']) ?>" class="btn btn-sm btn-warning">Sửa</a>
                                         <a href="<?= base_url('chi_tiet_phieu_cham_cong/delete/' . $row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa chi tiết này?')">Xóa</a>
                                     </td>
                                 </tr>
@@ -180,7 +168,56 @@ use Rating\Helpers\StatusEnum;
             <?php endif; ?>
         </div>
     </section>
+    <!-- JavaScript xử lý popup xác nhận -->
+    <script>
+        // Xác nhận duyệt
+        document.querySelectorAll('.approve-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const approveUrl = '<?= get_uri("phieu_cham_cong/approve/") ?>' + id;
 
+                Swal.fire({
+                    title: 'Xác nhận duyệt',
+                    text: 'Bạn có chắc chắn muốn duyệt phiếu chấm công này không?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = approveUrl;
+                    }
+                });
+            });
+        });
+
+        // Xác nhận từ chối
+        document.querySelectorAll('.reject-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const rejectUrl = '<?= get_uri("phieu_cham_cong/reject/") ?>' + id;
+
+                Swal.fire({
+                    title: 'Xác nhận từ chối',
+                    text: 'Bạn có chắc chắn muốn từ chối phiếu chấm công này không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = rejectUrl;
+                    }
+                });
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

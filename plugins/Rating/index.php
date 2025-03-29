@@ -34,7 +34,6 @@ if (!function_exists('rating_left_menu')) {
                         "class" => "star",   // Icon (thử dùng icon hợp lệ)
                         "position" => 6,
                 );
-
                 return $sidebar_menu;
         }
 }

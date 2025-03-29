@@ -72,7 +72,7 @@ $tables = [
         `created_at` DATETIME,
         `approve_id` INT,
         `approve_at` DATETIME,
-        `trang_thai` ENUM('pending', 'approve', 'reject') NOT NULL DEFAULT 'pending',
+      `trang_thai` TINYINT NOT NULL DEFAULT 1 COMMENT '1: Pending, 2: Approve, 3: Reject',
         `tong_diem` BIGINT,
         PRIMARY KEY (`id`),
         FOREIGN KEY (`created_id`) REFERENCES `{$dbprefix}users`(`id`) ON DELETE RESTRICT,
@@ -194,7 +194,7 @@ foreach ($evaluationCriteria as $categoryName => $criteriaList) {
 // 4. Thêm dữ liệu vào bảng phieu_cham_cong (không gán điểm số, để trống tong_diem)
 $db->query(
     "INSERT INTO `{$dbprefix}phieu_cham_cong` (`created_id`, `approve_id`, `approve_at`, `trang_thai`, `tong_diem`) VALUES (?, ?, ?, ?, ?)",
-    [2, 3, '2025-03-24 10:00:00', 'Đã phê duyệt', NULL]
+    [2, 3, '2025-03-24 10:00:00', 2, NULL]
 );
 
 // 5. Bỏ qua việc chèn dữ liệu vào bảng chi_tiet_phieu_cham_cong

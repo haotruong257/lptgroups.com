@@ -16,18 +16,15 @@ class EvaluationCriteriaController extends Security_Controller
     // Danh sách tiêu chí kèm danh mục
     public function index(): string
     {
+        $model = new PhieuChamCongModel();
+        $data['phieu_cham_cong'] = $model->getPhieuChamCong();
         $model = new EvaluationCriteriaModel();
         $data['criteria'] = $model->get_all_criteria_with_category();
-        return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
-        // $model = new PhieuChamCongModel();
-        // $data['phieu_cham_cong'] = $model->getPhieuChamCong();
-        // $model = new EvaluationCriteriaModel();
-        // $data['criteria'] = $model->get_all_criteria_with_category();
-        // if ($this->login_user->is_admin) {
-        //     return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
-        // } else {
-        //     return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
-        // }
+        if ($this->login_user->is_admin) {
+            return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
+        } else {
+            return $this->template->rander('Rating\Views\evaluation_criteria\index', $data);
+        }
     }
 
     // Thêm tiêu chí mới
@@ -74,4 +71,5 @@ class EvaluationCriteriaController extends Security_Controller
         $model->delete_criteria($id);
         return redirect()->to('/evaluation_criteria')->with('success', 'Xóa tiêu chí thành công!');
     }
+    
 }

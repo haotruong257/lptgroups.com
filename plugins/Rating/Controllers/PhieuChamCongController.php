@@ -3,15 +3,17 @@
 namespace Rating\Controllers;
 
 use App\Controllers\Security_Controller;
-use Rating\Helpers\StatusEnum;
 use Rating\Models\ChiTietPhieuChamCongModel;
 use Rating\Models\PhieuChamCongModel;
+use Rating\Models\EvaluationCriteriaModel;
 
 class PhieuChamCongController extends Security_Controller
 {
+    protected $db;
     function __construct()
     {
         parent::__construct();
+        $this->db = db_connect('default');
     }
 
     // Danh sách phiếu chấm công
@@ -19,15 +21,41 @@ class PhieuChamCongController extends Security_Controller
     {
         $loginUserID =  $this->login_user->is_admin ? 0 : $this->login_user->id;
         $model = new PhieuChamCongModel();
-        $searchName = $this->request->getGet("search");
-        $searchDate = $this->request->getGet("date");
 
-        if (!empty($searchName) || !empty($searchDate)) {
-            $data['phieu_cham_cong'] = $model->searchPhieuChamCong($searchName, $searchDate, $loginUserID);
+        // Số lượng bản ghi mỗi trang
+        $perPage = 10;
+        $page = $this->request->getGet('page') ?? 1;
+        $offset = ($page - 1) * $perPage;
+
+        $searchName = $this->request->getGet("search") ?? '';
+        $searchDate = $this->request->getGet("date")?? '';
+        $trangThai = $this->request->getGet("trang_thai")?? ''; 
+        
+        if (!empty($searchName) || !empty($searchDate) || !empty($trangThai)) {
             $data['search'] = $searchName;
             $data['date'] = $searchDate;
+            $data['trang_thai'] = $trangThai;
+            // Tính tổng số bản ghi để phân trang
+            $totalRecords = $model->countPhieuChamCong($searchName,$searchDate,$trangThai,$loginUserID);
+            $data['pager'] = [
+                'total' => $totalRecords,
+                'perPage' => $perPage,
+                'currentPage' => $page,
+                'totalPages' => ceil($totalRecords / $perPage),
+            ];
+            $data['phieu_cham_cong'] = $model->searchPhieuChamCong($searchName, $searchDate, $trangThai, $loginUserID,$perPage, $offset);
         } else {
-            $data['phieu_cham_cong'] = $model->getPhieuChamCong($loginUserID);
+            // Tính tổng số bản ghi để phân trang
+            $totalRecords = $model->countPhieuChamCong($searchName,$searchDate,$trangThai,$loginUserID);
+            $data['pager'] = [
+                'total' => $totalRecords,
+                'perPage' => $perPage,
+                'currentPage' => $page,
+                'totalPages' => ceil($totalRecords / $perPage),
+            ];
+            //$data['phieu_cham_cong'] = $model->searchPhieuChamCong($searchName, $searchDate, $trangThai, $loginUserID,$perPage, $offset);
+            $data['phieu_cham_cong'] = $model->getPhieuChamCong($loginUserID, $perPage, $offset);
+            
         }
 
         return $this->template->rander('Rating\Views\phieu_cham_cong\index', $data);
@@ -73,9 +101,9 @@ class PhieuChamCongController extends Security_Controller
         $phieuData = [
             'created_id' => $currentUserId,
             'created_at' => date('Y-m-d H:i:s'),
-            'approve_id' => $this->request->getPost('approve_id'),
-            'approve_at' => $this->request->getPost('approve_at'),
-            'trang_thai' => StatusEnum::PENDING->value,
+            // 'approve_id' => $this->request->getPost('approve_id'),
+            // 'approve_at' => $this->request->getPost('approve_at'),
+            'trang_thai' => 1, // Trạng thái 1: Chờ duyệt
             'tong_diem' => 0
         ];
 
@@ -120,74 +148,223 @@ class PhieuChamCongController extends Security_Controller
             'message' => 'Thêm phiếu chấm công thành công!',
             'duration' => 5000
         ]);
-        return redirect()->to(uri: '/phieu_cham_cong');
+        return redirect()->to('/phieu_cham_cong');
     }
 
     // Chỉnh sửa phiếu chấm công
     public function edit($id)
     {
-        $model = new PhieuChamCongModel();
-        $data['phieu_cham_cong'] = $model->get_phieu_cham_cong($id);
-        return $this->template->rander('Rating\Views\phieu_cham_cong\edit', $data);
+        try {
+            // Kiểm tra login_user
+            if (!isset($this->login_user) || !isset($this->login_user->id)) {
+                throw new \Exception("Debug - Người dùng chưa đăng nhập!");
+            }
+
+            $model = new PhieuChamCongModel();
+            // Lấy thông tin phiếu chấm công
+            $phieu = $model->getPhieuChamCongById($id);
+
+
+            if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+                return redirect()->to('/phieu_cham_cong')->with('popup', [
+                    'type' => 'error',
+                    'title' => 'Lỗi',
+                    'message' => 'Bạn không có quyền chỉnh sửa phiếu này hoặc phiếu không thể chỉnh sửa!',
+                    'duration' => 3000
+                ]);
+            }
+
+            // Lấy điểm số hiện tại
+            $scores = $model->getChiTietByPhieuId($id);
+
+            // Lấy danh sách tiêu chí đánh giá
+            $criteriaModel = new EvaluationCriteriaModel();
+            $criteria = $criteriaModel->get_all_criteria_with_category();
+
+
+
+            $data = [
+                'phieu' => $phieu,
+                'scores' => $scores,
+                'criteria' => $criteria
+            ];
+            return $this->template->rander('Rating\Views\phieu_cham_cong\edit', $data);
+        } catch (\Exception $e) {
+            echo "Lỗi: " . $e->getMessage() . "<br>";
+            echo "Dòng: " . $e->getLine() . "<br>";
+            echo "File: " . $e->getFile() . "<br>";
+            die();
+        }
     }
 
     public function update($id)
     {
         $model = new PhieuChamCongModel();
-        // Lấy tất cả dữ liệu từ POST
-        $input = $this->request->getPost();
 
-        // Danh sách các field hợp lệ (nên lấy từ model nếu có)
-        $allowedFields = ['created_id', 'approve_id', 'approve_at', 'trang_thai', 'tong_diem'];
-
-        // Tạo mảng dữ liệu để cập nhật
-        $data = [];
-
-        // Xử lý từng field trong input
-        foreach ($input as $key => $value) {
-            $data[$key] = $value;
-            // if (in_array($key, $allowedFields)) {
-            //     if ($key === 'trang_thai') {
-            //         try {
-            //             // Chuyển đổi giá trị trang_thai sang StatusEnum
-            //             $trangThai = StatusEnum::from($value);
-            //             $data['trang_thai'] = $trangThai->value;
-            //         } catch (\ValueError $e) {
-            //             return redirect()->back()->with('error', 'Trạng thái không hợp lệ: ' . $e->getMessage());
-            //         }
-            //     } else {
-            //         $data[$key] = $value;
-            //     }
-            // }
+        // Kiểm tra quyền chỉnh sửa
+        $phieu = $model->getPhieuChamCongById($id);
+        if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Bạn không có quyền chỉnh sửa phiếu này hoặc phiếu không thể chỉnh sửa!',
+                'duration' => 3000
+            ]);
         }
-        // Nếu không có dữ liệu để cập nhật
-        if (empty($data)) {
-            return redirect()->back()->with('error', 'Không có dữ liệu để cập nhật.');
+
+        // Lấy điểm số từ form
+        $scores = $this->request->getPost('score');
+        if (empty($scores) || !is_array($scores)) {
+            return redirect()->to('/phieu_cham_cong/edit/' . $id)->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Vui lòng chấm điểm ít nhất một tiêu chí.',
+                'duration' => 3000
+            ]);
         }
-        // Cập nhật dữ liệu
-        if ($model->update_phieu_cham_cong($data, $id)) {
-            return redirect()->to('/phieu_cham_cong')->with('success', 'Cập nhật thành công!');
+
+        // Cập nhật chi tiết và tổng điểm
+        if ($model->updateChiTietPhieu($id, $scores)) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'message' => 'Cập nhật phiếu chấm công thành công!',
+                'duration' => 3000
+            ]);
         } else {
-            return redirect()->back()->with('error', 'Cập nhật thất bại.');
-        } 
-
-        // $data = [
-        //     'created_id' => $this->request->getPost('created_id'),
-        //     'approve_id' => $this->request->getPost('approve_id'),
-        //     'approve_at' => $this->request->getPost('approve_at'),
-        //     'trang_thai' => $this->request->getPost('trang_thai'),
-        //     'tong_diem' => $this->request->getPost('tong_diem')
-        // ];
-
-        // $model->update_phieu_cham_cong($data, $id);
-        // return redirect()->to('/phieu_cham_cong')->with('success', 'Cập nhật phiếu chấm công thành công!');
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Không thể cập nhật phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
     }
 
+    public function approve($id)
+    {
+        if (!$this->login_user->is_admin) {
+            // Chỉ admin mới được duyệt
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Bạn không có quyền duyệt phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
+
+        $model = new PhieuChamCongModel();
+        $phieu = $model->find($id);
+
+        if (!$phieu || $phieu['trang_thai'] != 1) {
+            // Phiếu không tồn tại hoặc không ở trạng thái Pending
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Phiếu không tồn tại hoặc không thể duyệt!',
+                'duration' => 3000
+            ]);
+        }
+
+        // Cập nhật trạng thái duyệt
+        $data = [
+            'approve_id' => $this->login_user->id, // ID của admin duyệt
+            'approve_at' => date('Y-m-d H:i:s'),   // Thời gian duyệt
+            'trang_thai' => 2                      // Đã duyệt
+        ];
+
+        if ($model->update($id, $data)) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'message' => 'Phiếu chấm công đã được duyệt!',
+                'duration' => 3000
+            ]);
+        } else {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Không thể duyệt phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
+    }
+    public function reject($id)
+    {
+        if (!$this->login_user->is_admin) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Bạn không có quyền từ chối phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
+
+        $model = new PhieuChamCongModel();
+        $phieu = $model->find($id);
+
+        if (!$phieu || $phieu['trang_thai'] != 1) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Phiếu không tồn tại hoặc không thể từ chối!',
+                'duration' => 3000
+            ]);
+        }
+
+        $data = [
+            'approve_id' => $this->login_user->id, // ID của admin từ chối
+            'approve_at' => date('Y-m-d H:i:s'),  // Thời gian từ chối
+            'trang_thai' => 3                     // Từ chối
+        ];
+
+        if ($model->update($id, $data)) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'message' => 'Phiếu chấm công đã bị từ chối!',
+                'duration' => 3000
+            ]);
+        } else {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Không thể từ chối phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
+    }
     // Xóa phiếu chấm công
     public function delete($id)
     {
         $model = new PhieuChamCongModel();
-        $model->delete_phieu_cham_cong($id);
-        return redirect()->to('/phieu_cham_cong')->with('success', 'Xóa phiếu chấm công thành công!');
+
+        // Kiểm tra quyền xóa
+        $phieu = $model->getPhieuChamCongById(id: $id);
+        if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Bạn không có quyền xóa phiếu này hoặc phiếu không thể xóa!',
+                'duration' => 3000
+            ]);
+        }
+
+        // Xóa phiếu
+        if ($model->deletePhieuChamCong($id)) {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'message' => 'Xóa phiếu chấm công thành công!',
+                'duration' => 2000
+            ]);
+        } else {
+            return redirect()->to('/phieu_cham_cong')->with('popup', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'message' => 'Không thể xóa phiếu chấm công!',
+                'duration' => 3000
+            ]);
+        }
     }
 }
