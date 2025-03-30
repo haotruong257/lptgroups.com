@@ -24,6 +24,27 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+        .text-nowrap {
+            white-space: nowrap;
+        }
+        .badge {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -41,13 +62,10 @@
             <?php if (isset($id_phieu_cham_cong)): ?>
                 <div class="card">
                     <div class="card-header">
-                        <h2>Danh sách phiếu chấm công</h2>
-                        <div class="">
-                            <a href=" <?= get_uri("phieu_cham_cong/"); ?>" class="btn btn-secondary mb-3">Quay lại danh sách phiếu chấm công</a>
-                        </div>
+                            <a href=" <?= get_uri("phieu_cham_cong/"); ?>" class="btn btn-info back-button">Quay lại danh sách</a>
                     </div>
                     <div class="card-body">
-                        <h3>Chi tiết phiếu chấm công ID: <?= esc($id_phieu_cham_cong) ?></h3>
+                    <h2 class="mb-3">Chi tiết phiếu chấm công ID: <?= esc($id_phieu_cham_cong) ?></h2>
                         <?php if (!empty($details)): ?>
                             <p><strong>Người tạo:</strong> <?= esc($details[0]['employee_name'] ?? 'Không xác định') ?></p>
                             <p><strong>Ngày tạo:</strong> <?= !empty($details[0]['created_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['created_at'])) : 'Không xác định' ?></p>
@@ -83,10 +101,12 @@
                                 if (!isset($criteriaByCategory[$categoryId])) {
                                     $criteriaByCategory[$categoryId] = [
                                         'name' => $row['category_name'] ?? 'Chưa phân loại',
-                                        'items' => []
+                                        'items' => [],
+                                        'total_score' => 0 // Biến lưu tổng điểm của category
                                     ];
                                 }
                                 $criteriaByCategory[$categoryId]['items'][] = $row;
+                                $criteriaByCategory[$categoryId]['total_score'] += $row['diem_so']; // Cộng tổng điểm
                             }
                             ?>
                             <?php foreach ($criteriaByCategory as $categoryId => $categoryData): ?>
@@ -101,12 +121,27 @@
                                         <td><?= esc($row['thu_tu_sap_xep']) ?></td>
                                         <td><?= !empty($row['noi_dung']) ? nl2br(esc($row['noi_dung'])) : '<em>Chưa có nội dung</em>' ?></td>
                                         <td class="text-center"><?= esc($row['diem_so']) ?></td>
-                                        <!-- <td>
-                                        <a href="<?= base_url('chi_tiet_phieu_cham_cong/edit/' . $row['id']) ?>" class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="<?= base_url('chi_tiet_phieu_cham_cong/delete/' . $row['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa chi tiết này?')">Xóa</a>
-                                    </td> -->
                                     </tr>
                                 <?php endforeach; ?>
+                                <!-- Hiển thị tổng điểm ngay sau nhóm nội dung -->
+                                <tr style="background-color: #e0e0e0; font-weight: bold;">
+                                    <td colspan="2" class="text-right">Tổng điểm của <?= esc($categoryData['name']) ?>:</td>
+                                    <td class="text-center"><?= esc($categoryData['total_score']) ?></td>
+                                    <!-- Dòng hiển thị trạng thái -->
+                                    <td colspan="3" class="text-center text-nowrap">                          
+                                        <?php 
+                                            $totalScore = $categoryData['total_score'];
+                                            if ($totalScore < 20) {
+                                                echo '<span class="text-danger">Biên bản cảnh cáo</span>';
+                                            } elseif ($totalScore >= 20 && $totalScore <= 30) {
+                                                echo '<span class="text-warning">Họp nhắc nhở</span>';
+                                            } else {
+                                                echo '<span class="text-success">An toàn</span>';
+                                            }
+                                        ?>
+                                    </td>
+                                </tr>
+                            
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
@@ -114,8 +149,7 @@
                             </tr>
                         <?php endif; ?>
                     </tbody>
-                </table>
-
+                </table>   
             <?php else: ?>
                 <table class="table table-bordered table-striped">
                     <thead class="table-dark">

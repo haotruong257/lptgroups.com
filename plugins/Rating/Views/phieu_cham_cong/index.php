@@ -17,6 +17,14 @@
             padding: 8px;
             text-align: left;
         }
+        td.no-wrap {
+            white-space: nowrap;
+        }
+
+        td.no-wrap .btn {
+            display: inline-block;
+            margin: 2px;
+        }
 
         th {
             background-color: #f2f2f2;
@@ -122,22 +130,22 @@
                                     <?php
                                     switch ($attendance['trang_thai']) {
                                         case 1:
-                                            echo 'Chờ duyệt';
+                                            echo '<span style="color: orange; font-weight: bold;">Chờ duyệt</span>';;
                                             break;
                                         case 2:
-                                            echo 'Đã duyệt';
+                                            echo '<span style="color: green; font-weight: bold;">Đã duyệt</span>';
                                             break;
                                         case 3:
-                                            echo 'Từ chối';
+                                            echo '<span style="color: red; font-weight: bold;">Từ chối</span>';
                                             break;
                                         default:
-                                            echo 'Chưa xác định';
+                                            echo '<span style="color: orange; font-weight: bold;">Chưa xác định</span>';
                                     }
                                     ?>
                                 </td>
                                 <td><?= esc($attendance['tong_diem'] ?? '0') ?></td>
-                                <td><?= esc($attendance['created_name']) ?></td>
-                                <td><?= esc($attendance['approved_name']) ?></td>
+                                <td><strong><?= esc($attendance['created_name']) ?></strong></td>
+                                <td><strong><?= esc($attendance['approved_name']) ?></strong></td>
 
                                 <td class="no-wrap">
                                     <?php if (is_admin()): ?>

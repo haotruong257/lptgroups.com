@@ -178,9 +178,18 @@ class PhieuChamCongModel extends Model
 
         // Tìm kiếm theo ngày (created_at)
         if (!empty($searchDate)) {
-            $yearMonth = date('Y-m', strtotime($searchDate)); // Chuyển sang YYYY-MM
-            $db_builder->where("DATE_FORMAT(phieu_cham_cong.created_at, '%Y-%m')", $yearMonth);
+            // Lấy phần YYYY-MM từ searchDate
+            $yearMonth = substr($searchDate, 0, 7); // Ví dụ: '2025-03'
+            $db_builder->like('phieu_cham_cong.created_at', $yearMonth);
+            // Loại bỏ các bản ghi có created_at rỗng hoặc null
+            $db_builder->where('phieu_cham_cong.created_at IS NOT NULL');
         }
+        
+        // // Tìm kiếm theo ngày (created_at)
+        // if (!empty($searchDate)) {
+        //     $yearMonth = date('Y-m', strtotime($searchDate)); // Chuyển sang YYYY-MM
+        //     $db_builder->where("DATE_FORMAT(phieu_cham_cong.created_at, '%Y-%m')", $yearMonth);
+        // }
         if (!empty($trangThai)) {
             $db_builder->where('phieu_cham_cong.trang_thai', (int)$trangThai); // Ép kiểu sang số nguyên
         }
@@ -201,7 +210,7 @@ class PhieuChamCongModel extends Model
         if ($userID > 0) {
             $db_builder->where('phieu_cham_cong.created_id', $userID);
         }
-        
+    
         // Tìm kiếm theo tên
         if (!empty($searchName)) {
             $db_builder->groupStart()
