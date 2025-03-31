@@ -180,7 +180,7 @@ class PhieuChamCongModel extends Model
         if (!empty($searchDate)) {
             // Lấy phần YYYY-MM từ searchDate
             $yearMonth = substr($searchDate, 0, 7); // Ví dụ: '2025-03'
-            $db_builder->like('phieu_cham_cong.created_at', $yearMonth);
+            $db_builder->like('phieu_cham_cong.created_at', match: $yearMonth);
             // Loại bỏ các bản ghi có created_at rỗng hoặc null
             $db_builder->where('phieu_cham_cong.created_at IS NOT NULL');
         }

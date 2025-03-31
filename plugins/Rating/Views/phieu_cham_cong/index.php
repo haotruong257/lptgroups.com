@@ -107,9 +107,9 @@
                     <thead>
                         <tr>
                             <th>ID Phiếu</th>
-                            <th>ID Người tạo</th>
+                            <!-- <th>ID Người tạo</th> -->
                             <th>Thời gian tạo</th>
-                            <th>ID Người duyệt</th>
+                            <!-- <th>ID Người duyệt</th> -->
                             <th>Thời gian duyệt</th>
                             <th>Trạng thái</th>
                             <th>Tổng điểm</th>
@@ -122,10 +122,10 @@
                         <?php foreach ($phieu_cham_cong as $attendance): ?>
                             <tr>
                                 <td><a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>"><?= esc($attendance['id']) ?></a></td>
-                                <td><?= esc($attendance['created_id']) ?></td>
-                                <td><?= esc($attendance['created_at'] ? date('d/m/Y H:i:s', strtotime($attendance['created_at'])) : 'Chưa có') ?></td>
-                                <td><?= esc($attendance['approve_id'] ?? 'Chưa có') ?></td>
-                                <td><?= esc($attendance['approve_at'] ?? 'Chưa có') ?></td>
+                                <!-- <td><?= esc($attendance['created_id']) ?></td> -->
+                                <td><?= esc($attendance['created_at'] ? date('d/m/Y', strtotime($attendance['created_at'])) : 'Chưa có') ?></td>
+                                <!-- <td><?= esc($attendance['approve_id'] ?? 'Chưa có') ?></td> -->
+                                <td><?= esc($attendance['approve_at'] ? date('d/m/Y', strtotime($attendance['approve_at'])) : 'Chưa có') ?></td>
                                 <td>
                                     <?php
                                     switch ($attendance['trang_thai']) {
