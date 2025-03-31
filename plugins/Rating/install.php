@@ -138,6 +138,8 @@ $evaluationCriteria = [
     'Chuyên Cần Và Tác Phong' => [
         ['noiDung' => 'Đi làm đúng giờ \n - Được phép đi trễ tối đa 30p/tháng, không quá 10p/lần: không xin phép \n - Được phép trễ tối đa 60p/tháng: Có xin duyệt \n - Được phép về sớm tối đa 60p/tháng: Có xin duyệt', 'thuTuSapXep' => 1],
         ['noiDung' => 'Đi làm đầy đủ: đủ công trên tháng, không nghỉ việc \n riêng quá 01 ngày/tháng. (Tính trên check in-out) \n Trừ các trường hợp sau, khi nghỉ không ảnh hưởng \n Điểm chung: \n - Việc hiếu, hỷ theo Luật Lao Động. \n - Bệnh có giấy Bệnh Viện \n - Nghỉ phép năm', 'thuTuSapXep' => 2],
+        ['noiDung' => 'Đi làm đúng giờ \n - Được phép đi trễ tối đa 30p/tháng, không quá 10p/lần: không xin phép \n - Được phép trễ tối đa 60p/tháng: Có xin duyệt \n - Được phép về sớm tối đa 60p/tháng: Có xin duyệt', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Đi làm đầy đủ: đủ công trên tháng, không nghỉ việc \n riêng quá 01 ngày/tháng. (Tính trên check in-out) \n Trừ các trường hợp sau, khi nghỉ không ảnh hưởng \n Điểm chung: \n - Việc hiếu, hỷ theo Luật Lao Động. \n - Bệnh có giấy Bệnh Viện \n - Nghỉ phép năm', 'thuTuSapXep' => 2],
         ['noiDung' => 'Tuân thủ nội quy quy định công ty, không vi phạm kỷ luật.', 'thuTuSapXep' => 3],
         ['noiDung' => 'Tác phong gọn gàng: quần áo, tóc tai,...', 'thuTuSapXep' => 4],
         ['noiDung' => 'Tập trung làm việc, không trì hoãn: luôn check mail, nắm được các thông báo- thay đổi trong quy trình làm việc, nắm được các thông tin từ công ty, ....', 'thuTuSapXep' => 5],
