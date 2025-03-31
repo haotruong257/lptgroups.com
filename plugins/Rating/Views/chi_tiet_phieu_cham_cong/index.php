@@ -185,7 +185,7 @@
                                             </td>
                                         <?php endif; ?>
                                         <td><?= esc($row['thu_tu_sap_xep']) ?></td>
-                                        <td><?= !empty($row['noi_dung']) ? nl2br(esc($row['noi_dung'])) : '<em>Chưa có nội dung</em>' ?></td>
+                                        <td><?= !empty($row['noi_dung']) ? nl2br($row['noi_dung']) : '<em>Chưa có nội dung</em>' ?></td>
                                         <td class="text-center"><?= esc($row['diem_so']) ?></td>
                                     </tr>
                                     

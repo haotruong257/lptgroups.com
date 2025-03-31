@@ -16,9 +16,8 @@
             <div>
                 <h3><?php echo app_lang("list_criteria"); ?></h3>
                 <a href="<?= get_uri('rating') ?>" class="btn btn-info">Lịch sử phiếu chấm công</a>
-
+                
             </div>
-
             <?php echo form_open(get_uri("phieu_cham_cong/create"), array("id" => "phieu-cham-cong", "class" => "general-form", "role" => "form")); ?>
 
             <div class="table-responsive">
@@ -76,7 +75,7 @@
 
                                     <td class="align-middle text-center"><?= $row['thu_tu_sap_xep'] ?></td>
                                     <td class="align-middle ">
-                                        <?= !empty($row['noi_dung']) ? nl2br(htmlspecialchars($row['noi_dung'])) : '<em>Chưa có nội dung</em>' ?>
+                                        <?= !empty($row['noi_dung']) ? nl2br($row['noi_dung']) : '<em>Chưa có nội dung</em>' ?>
                                     </td>
 
                                     <?php for ($i = 1; $i <= 5; $i++): ?>

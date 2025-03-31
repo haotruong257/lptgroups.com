@@ -85,7 +85,7 @@
 
                                     <td class="align-middle"><?= $row['thu_tu_sap_xep'] ?></td>
                                     <td class="align-middle">
-                                        <?= !empty($row['noi_dung']) ? nl2br(htmlspecialchars($row['noi_dung'])) : '<em>Chưa có nội dung</em>' ?>
+                                        <?= !empty($row['noi_dung']) ? nl2br($row['noi_dung']) : '<em>Chưa có nội dung</em>' ?>
                                     </td>
 
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
