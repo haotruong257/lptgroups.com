@@ -136,6 +136,8 @@ foreach ($query->getResult() as $row) {
 // 3. Thêm tiêu chí đánh giá (tương ứng với bảng noi_dung_danh_gia)
 $evaluationCriteria = [
     'Chuyên Cần Và Tác Phong' => [
+        ['noiDung' => 'Đi làm đúng giờ\n- Được phép đi trễ tối đa 30p/tháng, không quá 10p/lần: không xin phép\n- Được phép trễ tối đa 60p/tháng: Có xin duyệt\n- Được phép về sớm tối đa 60p/tháng: Có xin duyệt', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Đi làm đầy đủ: đủ công trên tháng, không nghỉ việc\nriêng quá 01 ngày/tháng. (Tính trên check in-out)\nTrừ các trường hợp sau, khi nghỉ không ảnh hưởng\ndiểm chung:\n- Việc hiếu, hỷ theo Luật Lao Động.\n- Bệnh có giấy Bệnh Viện\n- Nghỉ phép năm', 'thuTuSapXep' => 2],
         ['noiDung' => 'Tuân thủ nội quy quy định công ty, không vi phạm kỷ luật.', 'thuTuSapXep' => 3],
         ['noiDung' => 'Tác phong gọn gàng: quần áo, tóc tai,...', 'thuTuSapXep' => 4],
         ['noiDung' => 'Tập trung làm việc, không trì hoãn: luôn check mail, nắm được các thông báo- thay đổi trong quy trình làm việc, nắm được các thông tin từ công ty, ....', 'thuTuSapXep' => 5],
@@ -147,6 +149,11 @@ $evaluationCriteria = [
     ],
     'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác' => [
         ['noiDung' => 'Có chuyên môn tại vị trí đảm nhiệm', 'thuTuSapXep' => 1],
+        ['noiDung' => '"Mức độ hoàn thành KPI được giao: 100%, 80%, 70%,….\n"
+    "✓ <b>100%</b> trở lên: Vượt chỉ tiêu, xuất sắc.\n"
+    "✓ <b>80% - 99%</b>: Đạt yêu cầu, hoàn thành tốt công việc.\n"
+    "✓ <b>50% - 79%</b>: Dưới mức mong đợi, cần cải thiện.\n"
+    "✓ <b>Dưới 50%</b>: Kém, chưa đáp ứng yêu cầu."', 'thuTuSapXep' => 2],
         ['noiDung' => 'Hoàn thành đúng tiến độ đề ra (deadline công việc, dự án)', 'thuTuSapXep' => 3],
         ['noiDung' => 'Kỹ năng làm việc nhóm và hợp tác với các nhân sự/phòng ban', 'thuTuSapXep' => 4],
         ['noiDung' => 'Kỹ năng làm việc độc lập', 'thuTuSapXep' => 5],
