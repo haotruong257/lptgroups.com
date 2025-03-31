@@ -74,7 +74,7 @@ class PhieuChamCongController extends Security_Controller
         if ($latestPhieu) {
             $latestMonth = date('Y-m', strtotime($latestPhieu['created_at']));
             $currentMonth = date('Y-m');
-            if ($latestMonth === $currentMonth) {
+            if ($latestMonth === $currentMonth && $latestPhieu['trang_thai'] != 3) {
                 $this->session->setFlashdata('popup', [
                     'type' => 'warning',
                     'title' => 'Nhắc nhở',
