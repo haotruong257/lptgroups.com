@@ -65,11 +65,19 @@
                             <a href=" <?= get_uri("phieu_cham_cong/"); ?>" class="btn btn-info back-button">Quay lại danh sách</a>
                     </div>
                     <div class="card-body">
-                    <h2 class="mb-3">Chi tiết phiếu chấm công ID: <?= esc($id_phieu_cham_cong) ?></h2>
+                    <h2 class="mb-3">ID Phiếu: <?= esc($id_phieu_cham_cong) ?></h2>
                         <?php if (!empty($details)): ?>
                             <p><strong>Người tạo:</strong> <?= esc($details[0]['employee_name'] ?? 'Không xác định') ?></p>
                             <p><strong>Ngày tạo:</strong> <?= !empty($details[0]['created_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['created_at'])) : 'Không xác định' ?></p>
-                            <!-- <p><strong>Trạng Thái: </strong><?= esc($trang_thai)?></p>  -->
+                            <p><strong>Ngày duyệt:</strong> <?= !empty($details[0]['approved_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['approved_at'])) : 'Chưa C' ?></p>
+                            <p></p><strong>Trạng thái:</strong> 
+                                <?php if ($trang_thai == 1): ?>
+                                    <span class="badge bg-warning text-align">Chờ duyệt</span>
+                                <?php elseif ($trang_thai == 2): ?>
+                                    <span class="badge bg-success text-align">Đã Duyệt</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger text-align">Từ Chối</span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <div class="d-flex w-100 gap-3">
                             <?php if (isset($tong_diem)): ?>
