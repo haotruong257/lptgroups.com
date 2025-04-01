@@ -107,14 +107,15 @@
                     <thead>
                         <tr>
                             <th>ID Phiếu</th>
+                            <th>Tên người tạo</th>
+                            <th>Tên người duyệt</th>
                             <!-- <th>ID Người tạo</th> -->
                             <th>Thời gian tạo</th>
                             <!-- <th>ID Người duyệt</th> -->
                             <th>Thời gian duyệt</th>
                             <th>Trạng thái</th>
                             <th>Tổng điểm</th>
-                            <th>Tên người tạo</th>
-                            <th>Tên người duyệt</th>
+                            
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -122,6 +123,8 @@
                         <?php foreach ($phieu_cham_cong as $attendance): ?>
                             <tr>
                                 <td><a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>"><?= esc($attendance['id']) ?></a></td>
+                                <td><strong><?= esc($attendance['created_name']) ?></strong></td>
+                                <td><strong><?= esc($attendance['approved_name']) ?></strong></td>
                                 <!-- <td><?= esc($attendance['created_id']) ?></td> -->
                                 <td><?= esc($attendance['created_at'] ? date('d/m/Y', strtotime($attendance['created_at'])) : 'Chưa có') ?></td>
                                 <!-- <td><?= esc($attendance['approve_id'] ?? 'Chưa có') ?></td> -->
@@ -144,8 +147,7 @@
                                     ?>
                                 </td>
                                 <td><?= esc($attendance['tong_diem'] ?? '0') ?></td>
-                                <td><strong><?= esc($attendance['created_name']) ?></strong></td>
-                                <td><strong><?= esc($attendance['approved_name']) ?></strong></td>
+                                
 
                                 <td class="no-wrap">
                                     <?php if (is_admin()): ?>

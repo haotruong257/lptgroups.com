@@ -69,7 +69,7 @@
                         <?php if (!empty($details)): ?>
                             <p><strong>Người tạo:</strong> <?= esc($details[0]['employee_name'] ?? 'Không xác định') ?></p>
                             <p><strong>Ngày tạo:</strong> <?= !empty($details[0]['created_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['created_at'])) : 'Không xác định' ?></p>
-                            <p><strong>Ngày duyệt:</strong> <?= !empty($details[0]['approved_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['approved_at'])) : 'Chưa C' ?></p>
+                            <p><strong>Ngày duyệt:</strong> <?= !empty($details[0]['approved_at']) ? date('d/m/Y H:i:s', strtotime($details[0]['approved_at'])) : 'Chưa Có' ?></p>
                             <p></p><strong>Trạng thái:</strong> 
                                 <?php if ($trang_thai == 1): ?>
                                     <span class="badge bg-warning text-align">Chờ duyệt</span>
