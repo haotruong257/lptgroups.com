@@ -341,13 +341,15 @@ class PhieuChamCongController extends Security_Controller
 
         // Kiểm tra quyền xóa
         $phieu = $model->getPhieuChamCongById(id: $id);
-        if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+        if (!$phieu || $phieu['trang_thai'] != 1) { // check trang thái và phiếu có tồn tại
+            if(!$this->login_user->is_admin && $phieu['created_id'] != $this->login_user->id ){ // check quyền xóa
             return redirect()->to('/phieu_cham_cong')->with('popup', [
                 'type' => 'error',
                 'title' => 'Lỗi',
                 'message' => 'Bạn không có quyền xóa phiếu này hoặc phiếu không thể xóa!',
                 'duration' => 3000
             ]);
+         }
         }
 
         // Xóa phiếu

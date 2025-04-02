@@ -106,17 +106,17 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID Phiếu</th>
-                            <th>Tên người tạo</th>
-                            <th>Tên người duyệt</th>
+                            <th class="text-center">ID Phiếu</th>
+                            <th class="text-center">Tên người tạo</th>
+                            <th class="text-center">Tên người duyệt</th>
                             <!-- <th>ID Người tạo</th> -->
-                            <th>Thời gian tạo</th>
+                            <th class="text-center">Thời gian tạo</th>
                             <!-- <th>ID Người duyệt</th> -->
-                            <th>Thời gian duyệt</th>
-                            <th>Trạng thái</th>
-                            <th>Tổng điểm</th>
+                            <th class="text-center">Thời gian duyệt</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Tổng điểm</th>
                             
-                            <th>Hành động</th>
+                            <th class="text-center">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,7 +124,7 @@
                             <tr>
                                 <td><a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>"><?= esc($attendance['id']) ?></a></td>
                                 <td><strong><?= esc($attendance['created_name']) ?></strong></td>
-                                <td><strong><?= esc($attendance['approved_name']) ?></strong></td>
+                                <td><strong><?= esc($attendance['approved_name'] ?? 'Chờ Duyệt') ?></strong></td>
                                 <!-- <td><?= esc($attendance['created_id']) ?></td> -->
                                 <td><?= esc($attendance['created_at'] ? date('d/m/Y', strtotime($attendance['created_at'])) : 'Chưa có') ?></td>
                                 <!-- <td><?= esc($attendance['approve_id'] ?? 'Chưa có') ?></td> -->
@@ -147,14 +147,13 @@
                                     ?>
                                 </td>
                                 <td><?= esc($attendance['tong_diem'] ?? '0') ?></td>
-                                
-
                                 <td class="no-wrap">
                                     <?php if (is_admin()): ?>
                                         <a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-primary">Xem</a>
                                         <?php if ($attendance['trang_thai'] == 1): ?>
                                             <a href="#" class="btn btn-success approve-btn" data-id="<?= esc($attendance['id']) ?>">Duyệt</a>
-                                            <a href="#" class="btn btn-danger reject-btn" data-id="<?= esc($attendance['id']) ?>">Từ chối</a>
+                                            <a href="#" class="btn btn-warning reject-btn" data-id="<?= esc($attendance['id']) ?>">Từ chối</a>
+                                            <button class="btn btn-danger delete-btn" data-id="<?= esc(data: $attendance['id']) ?>">Xóa</button>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <?php if ($attendance['trang_thai'] == 1): ?>

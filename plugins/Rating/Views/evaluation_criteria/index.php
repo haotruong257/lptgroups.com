@@ -14,7 +14,6 @@
         <div class="card px-3 py-2">
             <h2 class="mb-3">Chấm điểm nhân viên</h2>
             <div>
-                <h3><?php echo app_lang("list_criteria"); ?></h3>
                 <a href="<?= get_uri('rating') ?>" class="btn btn-info">Lịch sử phiếu chấm công</a>
                 
             </div>
