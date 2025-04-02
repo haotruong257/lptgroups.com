@@ -153,6 +153,7 @@
                                         <a href="<?= get_uri("chi_tiet_phieu_cham_cong/" . $attendance['id']); ?>" class="btn btn-primary">Xem</a>
 
                                         <?php if ($attendance['trang_thai'] == 1): ?>
+                                            <a href="<?= get_uri("phieu_cham_cong/edit/" . $attendance['id']); ?>" class="btn btn-info">Cập nhật</a>
                                             <a href="#" class="btn btn-success approve-btn" data-id="<?= esc($attendance['id']) ?>">Duyệt</a>
                                             <a href="#" class="btn btn-warning reject-btn" data-id="<?= esc($attendance['id']) ?>">Từ chối</a>
                                         <?php endif; ?>

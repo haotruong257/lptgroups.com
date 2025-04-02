@@ -164,7 +164,7 @@ class PhieuChamCongController extends Security_Controller
             $phieu = $model->getPhieuChamCongById($id);
 
 
-            if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+            if (!$phieu || ($phieu['created_id'] != $this->login_user->id && !$this->login_user->is_admin) || $phieu['trang_thai'] != 1) {
                 return redirect()->to('/phieu_cham_cong')->with('popup', [
                     'type' => 'error',
                     'title' => 'Lỗi',
@@ -202,7 +202,7 @@ class PhieuChamCongController extends Security_Controller
 
         // Kiểm tra quyền chỉnh sửa
         $phieu = $model->getPhieuChamCongById($id);
-        if (!$phieu || $phieu['created_id'] != $this->login_user->id || $phieu['trang_thai'] != 1) {
+        if (!$phieu || ($phieu['created_id'] != $this->login_user->id && !$this->login_user->is_admin) || $phieu['trang_thai'] != 1) {
             return redirect()->to('/phieu_cham_cong')->with('popup', [
                 'type' => 'error',
                 'title' => 'Lỗi',
