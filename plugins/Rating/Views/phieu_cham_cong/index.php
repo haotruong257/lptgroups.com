@@ -27,6 +27,15 @@
             margin: 2px;
         }
 
+        td.no-wrap {
+            white-space: nowrap;
+        }
+
+        td.no-wrap .btn {
+            display: inline-block;
+            margin: 2px;
+        }
+
         th {
             background-color: #f2f2f2;
         }
@@ -116,8 +125,8 @@
                             <th class="text-center">Thời gian duyệt</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-center">Tổng điểm</th>
-
-                            <th class="text-center">Hành động</th>
+                            <<<<<<< HEAD=======>>>>>>> 608132e28c9ddf8dc5b5df61dca95e90d16eb149
+                                <th class="text-center">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -301,6 +310,77 @@
             showRatingRules();
         });
     </script>
+
+</body>
+
+Swal.fire({
+title: 'Xác nhận duyệt',
+text: 'Bạn có chắc chắn muốn duyệt phiếu chấm công này không?',
+icon: 'question',
+showCancelButton: true,
+confirmButtonColor: '#28a745',
+cancelButtonColor: '#d33',
+confirmButtonText: 'Đồng ý',
+cancelButtonText: 'Hủy'
+}).then((result) => {
+if (result.isConfirmed) {
+window.location.href = approveUrl;
+}
+});
+});
+});
+
+// Xác nhận từ chối
+document.querySelectorAll('.reject-btn').forEach(button => {
+button.addEventListener('click', function(e) {
+e.preventDefault();
+const id = this.getAttribute('data-id');
+const rejectUrl = '<?= get_uri("phieu_cham_cong/reject/") ?>' + id;
+
+Swal.fire({
+title: 'Xác nhận từ chối',
+text: 'Bạn có chắc chắn muốn từ chối phiếu chấm công này không?',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#d33',
+cancelButtonColor: '#3085d6',
+confirmButtonText: 'Đồng ý',
+cancelButtonText: 'Hủy'
+}).then((result) => {
+if (result.isConfirmed) {
+window.location.href = rejectUrl;
+}
+});
+});
+});
+
+// Xử lý xóa phiếu chấm công (không dùng AJAX)
+document.querySelectorAll('.delete-btn').forEach(button => {
+button.addEventListener('click', function(e) {
+e.preventDefault();
+const id = this.getAttribute('data-id');
+
+Swal.fire({
+title: 'Xác nhận xóa',
+text: 'Bạn có chắc chắn muốn xóa phiếu chấm công này?',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonText: 'Xóa',
+cancelButtonText: 'Hủy',
+confirmButtonColor: '#d33',
+cancelButtonColor: '#3085d6'
+}).then((result) => {
+if (result.isConfirmed) {
+// Chuyển hướng đến URL delete
+window.location.href = '<?= get_uri("phieu_cham_cong/delete/") ?>' + id;
+}
+});
+});
+});
+document.getElementById('showRulesBtn').addEventListener('click', function() {
+showRatingRules();
+});
+</script>
 
 </body>
 
