@@ -16,7 +16,6 @@ class EvaluationCriteriaController extends Security_Controller
     // Danh sách tiêu chí kèm danh mục
     public function index(): string
     {
-
         $model = new PhieuChamCongModel();
         $data['phieu_cham_cong'] = $model->getPhieuChamCong();
         $model = new EvaluationCriteriaModel();
@@ -72,4 +71,5 @@ class EvaluationCriteriaController extends Security_Controller
         $model->delete_criteria($id);
         return redirect()->to('/evaluation_criteria')->with('success', 'Xóa tiêu chí thành công!');
     }
+    
 }

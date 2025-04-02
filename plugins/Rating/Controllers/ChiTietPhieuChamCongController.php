@@ -20,6 +20,7 @@ class ChiTietPhieuChamCongController extends Security_Controller
             $data['details'] = $model->get_details_with_criteria($id_phieu_cham_cong);
             $data['id_phieu_cham_cong'] = $id_phieu_cham_cong;
             $data['tong_diem'] = $model->calculate_total_score($id_phieu_cham_cong);
+            $data["trang_thai"] = $model -> get_status_phieu_cham_cong($id_phieu_cham_cong);
         } else {
             $data['details'] = $model->get_all_chi_tiet_phieu_cham_cong(10, $this->request->getGet('page') ? ($this->request->getGet('page') - 1) * 10 : 0);
             echo "<pre> ID Phieu Cham Cong : <br/>";

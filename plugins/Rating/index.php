@@ -26,7 +26,6 @@ if (!function_exists('rating_left_menu')) {
                 if ($ci->login_user->user_type === "client" && !get_setting("client_can_access_rating")) {
                         return $sidebar_menu;
                 }
-
                 // Thêm menu vào sidebar
                 $sidebar_menu["rating"] = array(
                         "name" => "Rating",  // Hiển thị chữ "Rating"
@@ -34,23 +33,22 @@ if (!function_exists('rating_left_menu')) {
                         "class" => "star",   // Icon (thử dùng icon hợp lệ)
                         "position" => 6,
                 );
-
                 return $sidebar_menu;
         }
 }
 
 
-// Add admin setting menu item
-app_hooks()->add_filter('app_filter_admin_settings_menu', function ($sidebar_menu) {
-        $sidebar_menu["plugins"][] = array("name" => "Rating", "url" => "evaluation_criteria");
-        return $sidebar_menu;
-});
+// // Add admin setting menu item
+// app_hooks()->add_filter('app_filter_admin_settings_menu', function ($sidebar_menu) {
+//         $sidebar_menu["plugins"][] = array("name" => "Rating", "url" => "evaluation_criteria");
+//         return $sidebar_menu;
+// });
 
 
 // Add setting link to the plugin setting
 app_hooks()->add_filter('app_filter_action_links_of_Rating', function () {
         $action_links_array = array(
-                anchor(get_uri("evaluation_criteria"), "Rating"),
+                anchor(get_uri("rating"), "Rating"),
         );
 
         return $action_links_array;

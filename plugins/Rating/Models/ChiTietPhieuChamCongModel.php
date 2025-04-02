@@ -3,16 +3,18 @@
 namespace Rating\Models;
 
 use App\Models\Crud_model;
+use CodeIgniter\Model;
 
-class ChiTietPhieuChamCongModel extends Crud_model
+class ChiTietPhieuChamCongModel extends Model
 {
     protected $table = 'chi_tiet_phieu_cham_cong';
     protected $primaryKey = 'id';
     protected $allowedFields = ['id_noi_dung_danh_gia', 'diem_so', 'id_phieu_cham_cong'];
-
+    protected $db;
     public function __construct()
     {
         parent::__construct();
+        $this->db = db_connect('default');
     }
 
     // Get all chi_tiet_phieu_cham_cong
@@ -138,5 +140,13 @@ class ChiTietPhieuChamCongModel extends Crud_model
         $db_builder->where('chi_tiet_phieu_cham_cong.id_phieu_cham_cong', $id_phieu_cham_cong);
         $db_builder->orderBy('evaluation_criteria.thu_tu_sap_xep', 'asc');
         return $db_builder->get()->getResultArray();
+    }
+
+    public function get_status_phieu_cham_cong($id_phieu_cham_cong){
+        $db_builder = $this->db->table(get_db_prefix() . 'phieu_cham_cong');
+        $db_builder->select('trang_thai'); // Chỉ lấy cột trang_thai
+        $db_builder->where('id', $id_phieu_cham_cong);
+        $result = $db_builder->get()->getRowArray(); // Lấy một dòng duy nhất
+         return $result ? $result['trang_thai'] : null; // Trả về giá trị hoặc null nếu không có
     }
 }

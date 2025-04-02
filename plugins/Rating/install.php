@@ -72,7 +72,7 @@ $tables = [
         `created_at` DATETIME,
         `approve_id` INT,
         `approve_at` DATETIME,
-        `trang_thai` ENUM('pending', 'approve', 'reject') NOT NULL DEFAULT 'pending',
+      `trang_thai` TINYINT NOT NULL DEFAULT 1 COMMENT '1: Pending, 2: Approve, 3: Reject',
         `tong_diem` BIGINT,
         PRIMARY KEY (`id`),
         FOREIGN KEY (`created_id`) REFERENCES `{$dbprefix}users`(`id`) ON DELETE RESTRICT,
@@ -136,6 +136,8 @@ foreach ($query->getResult() as $row) {
 // 3. Thêm tiêu chí đánh giá (tương ứng với bảng noi_dung_danh_gia)
 $evaluationCriteria = [
     'Chuyên Cần Và Tác Phong' => [
+        ['noiDung' => 'Đi làm đúng giờ <br> - Được phép đi trễ tối đa 30p/tháng, không quá 10p/lần: không xin phép <br> - Được phép trễ tối đa 60p/tháng: Có xin duyệt <br> - Được phép về sớm tối đa 60p/tháng: Có xin duyệt', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Đi làm đầy đủ: đủ công trên tháng, không nghỉ việc <br> riêng quá 01 ngày/tháng. (Tính trên check in-out) <br> Trừ các trường hợp sau, khi nghỉ không ảnh hưởng <br> Điểm chung: <br> - Việc hiếu, hỷ theo Luật Lao Động. <br> - Bệnh có giấy Bệnh Viện <br> - Nghỉ phép năm', 'thuTuSapXep' => 2],
         ['noiDung' => 'Tuân thủ nội quy quy định công ty, không vi phạm kỷ luật.', 'thuTuSapXep' => 3],
         ['noiDung' => 'Tác phong gọn gàng: quần áo, tóc tai,...', 'thuTuSapXep' => 4],
         ['noiDung' => 'Tập trung làm việc, không trì hoãn: luôn check mail, nắm được các thông báo- thay đổi trong quy trình làm việc, nắm được các thông tin từ công ty, ....', 'thuTuSapXep' => 5],
@@ -147,6 +149,11 @@ $evaluationCriteria = [
     ],
     'Chuyên Môn Hiệu Quả Công Việc Kỹ Năng Khác' => [
         ['noiDung' => 'Có chuyên môn tại vị trí đảm nhiệm', 'thuTuSapXep' => 1],
+        ['noiDung' => 'Mức độ hoàn thành KPI được giao: 100%, 80%, 70%,…. 
+            <br>✓ 100% trở lên: Vượt chỉ tiêu, xuất sắc.
+            <br>✓ 80% - 99%: Đạt yêu cầu, hoàn thành tốt công việc.
+            <br>✓ 50% - 79%: Dưới mức mong đợi, cần cải thiện.
+            <br>✓ Dưới 50%: Kém, chưa đáp ứng yêu cầu.', 'thuTuSapXep' => 2],
         ['noiDung' => 'Hoàn thành đúng tiến độ đề ra (deadline công việc, dự án)', 'thuTuSapXep' => 3],
         ['noiDung' => 'Kỹ năng làm việc nhóm và hợp tác với các nhân sự/phòng ban', 'thuTuSapXep' => 4],
         ['noiDung' => 'Kỹ năng làm việc độc lập', 'thuTuSapXep' => 5],
@@ -194,7 +201,7 @@ foreach ($evaluationCriteria as $categoryName => $criteriaList) {
 // 4. Thêm dữ liệu vào bảng phieu_cham_cong (không gán điểm số, để trống tong_diem)
 $db->query(
     "INSERT INTO `{$dbprefix}phieu_cham_cong` (`created_id`, `approve_id`, `approve_at`, `trang_thai`, `tong_diem`) VALUES (?, ?, ?, ?, ?)",
-    [2, 3, '2025-03-24 10:00:00', 'Đã phê duyệt', NULL]
+    [2, 3, '2025-03-24 10:00:00', 2, NULL]
 );
 
 // 5. Bỏ qua việc chèn dữ liệu vào bảng chi_tiet_phieu_cham_cong

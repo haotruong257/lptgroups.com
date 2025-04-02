@@ -53,6 +53,7 @@ if ($hide_form) {
         </div>
     </div>
     <div class="clearfix">
+        <h1>Hehehehehehhe</h1>
         <div class="row">
             <div class="col-md-6 col-sm-6 form-group">
                 <?php

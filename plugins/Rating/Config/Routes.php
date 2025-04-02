@@ -8,7 +8,7 @@ $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     // Routes cho EvaluationController (giữ nguyên từ file gốc)
     // $routes->get('rating', 'EvaluationController::index');
     $routes->get('category', 'EvaluationController::categoryView');
-    $routes->get('rating', 'MainController::index'); 
+    $routes->get('rating', 'PhieuChamCongController::index');
 
     // $routes->post('category/createCategory', 'EvaluationController::createCategory');
 
@@ -32,6 +32,8 @@ $routes->group('', ['namespace' => 'Rating\Controllers'], function ($routes) {
     $routes->get('phieu_cham_cong/edit/(:num)', 'PhieuChamCongController::edit/$1'); // Hiển thị form chỉnh sửa phiếu
     $routes->post('phieu_cham_cong/update/(:num)', 'PhieuChamCongController::update/$1'); // Cập nhật phiếu
     $routes->get('phieu_cham_cong/delete/(:num)', 'PhieuChamCongController::delete/$1'); // Xóa phiếu
+    $routes->get('phieu_cham_cong/approve/(:num)', 'PhieuChamCongController::approve/$1');
+    $routes->get('phieu_cham_cong/reject/(:num)', 'PhieuChamCongController::reject/$1');
 
     // Routes cho ChiTietPhieuChamCongController
     $routes->get('chi_tiet_phieu_cham_cong', 'ChiTietPhieuChamCongController::index'); // Hiển thị danh sách chi tiết phiếu chấm công
